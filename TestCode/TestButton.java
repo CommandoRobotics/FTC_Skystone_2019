@@ -1,3 +1,6 @@
+/*
+This program was developed on Grover and is not meant for other robotics, but rather as a reference.*/
+
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -10,6 +13,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name="TestButton")
+@Disabled
 
 public class TestButton extends LinearOpMode {
 
