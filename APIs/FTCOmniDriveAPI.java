@@ -21,11 +21,8 @@ public class FTCOmniDriveAPI{
     double goldenRatio;
 
     targetLeftMotorSpeed = rotationInput+forwardInput;
-    System.out.println("Raw target left motor speed : " + targetLeftMotorSpeed);
     targetRightMotorSpeed = -rotationInput+forwardInput;
-    System.out.println("Raw target right motor speed : " + targetRightMotorSpeed);
     targetStrafeMotorSpeed = strafeInput;
-    System.out.println("Raw target strafe motor speed : " + targetStrafeMotorSpeed);
 
     if(Math.abs(targetLeftMotorSpeed) > 1){
       goldenRatio = targetLeftMotorSpeed/targetRightMotorSpeed;
