@@ -1,45 +1,49 @@
-/*
-This program was developed on Grover and is not meant for other robotics, but rather as a reference.*/
+// // /*
+// import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+// import com.qualcomm.robotcore.hardware.TouchSensor;
+// import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+// import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-package org.firstinspires.ftc.teamcode;
+// // This program was developed on Grover and is not meant for other robotics, but rather as a reference.*/
 
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.TouchSensor;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
+// package org.firstinspires.ftc.teamcode;
 
-@TeleOp(name="TestButton")
-@Disabled
+// import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+// import com.qualcomm.robotcore.hardware.DigitalChannel;
+// import com.qualcomm.robotcore.hardware.TouchSensor;
+// import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+// import com.qualcomm.robotcore.eventloop.opmode.Disabled;
+// import com.qualcomm.robotcore.hardware.DcMotor;
+// import com.qualcomm.robotcore.util.ElapsedTime;
+// import com.qualcomm.robotcore.util.Range;
 
-public class TestButton extends LinearOpMode {
+// @TeleOp(name="TestButton")
+// @Disabled
 
-    @Override
-    public void runOpMode() {
+// public class TestButton extends LinearOpMode {
 
-        // public TouchSensor testButton();
-        TouchSensor testButton = hardwareMap.get(TouchSensor.class , "testButton");
-        DcMotor testMotor = hardwareMap.get(DcMotor.class, "testMotor");
+//     @Override
+//     public void runOpMode() {
 
-        telemetry.addLine("Robot Initialized");
-        telemetry.update();
+//         // public TouchSensor testButton();
+//         TouchSensor testButton = hardwareMap.get(TouchSensor.class , "testButton");
 
-        waitForStart();
+//         telemetry.addLine("Robot Initialized");
+//         telemetry.update();
 
-        while (opModeIsActive()) {
+//         waitForStart();
 
-            telemetry.addData("Is button pressed?", testButton.getValue());
+//         while (opModeIsActive()) {
 
-            if(testButton.getValue() == 1){
-              testMotor.setPower(1);
-            } else {
-                testMotor.setPower(0);
-            }
+//             telemetry.addData("Is button pressed?", testButton.getValue());
 
-            telemetry.update();
-        }
-    }
-}
+//             if(testButton.getValue() == 1){
+//               testMotor.setPower(1);
+//             } else {
+//                 testMotor.setPower(0);
+//             }
+
+//             telemetry.update();
+//         }
+//     }
+// }
