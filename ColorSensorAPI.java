@@ -5,17 +5,20 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 public class ColorSensorAPI {
   
   ColorSensor color;
-  void enableLed(true);
+  double[3] getRGBValue;
+  
   
   public ColorSensorAPI() {
-     color = new ColorSensor(#);
+    color = new ColorSensor();
+    color.enableLed(true);
+
   }
   
   public double[] getRGBValue() {
-    getRGBValue = new double[3];
-    getRGBValue[0] = colorsensor.int red();
-    getRGBValue[1] = colorsensor.int green ();
-    getRGBValue[2] = colorsensor.int blue ();
+    this.getRGBValue[0] = colorsensor.int red();
+    this.getRGBValue[1] = colorsensor.int green();
+    this.getRGBValue[2] = colorsensor.int blue();
+    this.system.out.println(getRGBValue[0], getRGBValue[1], getRGBValue[2]);
   }
   
   public void int red() {
@@ -27,18 +30,15 @@ public class ColorSensorAPI {
   }
   
   public void int blue() {
-    return this.colorSensor.bLue();
+    return this.colorSensor.blue();
   }
   
-  public void int isYellow(){
+  public void int isYellow() {
     
     
   }
-  public void int isBlack(){
+  public void int isBlack() {
     
     
   }
-
-  
-  system.out.println(getRGBValue[0,1,2])
 }
