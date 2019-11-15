@@ -29,8 +29,8 @@ import org.firstinspires.ftc.teamcode.APIs.FTCOmniDriveAPI;
 
 public class TeleopMain extends LinearOpMode {
 
-  private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = FRONT;
-  private static final boolean PHONE_IS_PORTRAIT = false  ;
+  private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
+  private static final boolean PHONE_IS_PORTRAIT = true  ;
 
     /*
     * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -78,17 +78,24 @@ public class TeleopMain extends LinearOpMode {
     public void runOpMode() {
         //TouchSensor intakeButton = hardwareMap.get(TouchSensor.class, "intakeButton");
         //ColorSensor colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
-
+        telemetry.addLine("Robot Status : Creating Camera");
+        telemetry.update();
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
-
+        telemetry.addLine("Robot Status : Setting Parameters");
+        telemetry.update();
         parameters.vuforiaLicenseKey = VUFORIA_KEY;
         parameters.cameraDirection   = CAMERA_CHOICE;
-
+        telemetry.addLine("Robot Status : Creating Vuforia Object");
+        telemetry.update();
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
 
+        telemetry.addLine("Robot Status : Loading Trackables");
+        telemetry.update();
         VuforiaTrackables targetsSkyStone = this.vuforia.loadTrackablesFromAsset("Skystone");
 
+        telemetry.addLine("Robot Status : Setting Trackable Names");
+        telemetry.update();
         VuforiaTrackable stoneTarget = targetsSkyStone.get(0);
         stoneTarget.setName("Stone Target");
         VuforiaTrackable blueRearBridge = targetsSkyStone.get(1);
@@ -116,9 +123,14 @@ public class TeleopMain extends LinearOpMode {
         VuforiaTrackable rear2 = targetsSkyStone.get(12);
         rear2.setName("Rear Perimeter 2");
 
+        telemetry.addLine("Robot Status : Gathering All Trackables");
+        telemetry.update();
         // For convenience, gather together all the trackable objects in one easily-iterable collection */
         List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
         allTrackables.addAll(targetsSkyStone);
+
+        telemetry.addLine("Robot Status : Setting Trackable Location");
+        telemetry.update();
 
         stoneTarget.setLocation(OpenGLMatrix
                 .translation(0, 0, stoneZ)
@@ -174,6 +186,9 @@ public class TeleopMain extends LinearOpMode {
                 .translation(halfField, -quadField, mmTargetHeight)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90)));
 
+                telemetry.addLine("Robot Status : Setting Camera Rotation");
+                telemetry.update();
+
         if (CAMERA_CHOICE == BACK) {
             phoneYRotate = -90;
         } else {
@@ -184,53 +199,55 @@ public class TeleopMain extends LinearOpMode {
             phoneXRotate = 90 ;
         }
 
-        final float CAMERA_FORWARD_DISPLACEMENT  = 4.0f * mmPerInch;   // eg: Camera is 4 Inches in front of robot center
-        final float CAMERA_VERTICAL_DISPLACEMENT = 8.0f * mmPerInch;   // eg: Camera is 8 Inches above ground
-        final float CAMERA_LEFT_DISPLACEMENT     = 0;     // eg: Camera is ON the robot's center line
+        telemetry.addLine("Robot Status : Declaring Some Constants");
+        telemetry.update();
+
+
+        final float CAMERA_FORWARD_DISPLACEMENT  = 1.275f * mmPerInch;   // eg: 4f if Camera is 4 Inches in front of robot center
+        final float CAMERA_VERTICAL_DISPLACEMENT = 11.625f * mmPerInch;   // eg: 8f if Camera is 8 Inches above ground
+        final float CAMERA_LEFT_DISPLACEMENT     = 7;     // eg: 0f if Camera is ON the robot's center line
+
+        telemetry.addLine("Robot Status : Setting Camera Location");
+        telemetry.update();
+
 
         OpenGLMatrix robotFromCamera = OpenGLMatrix
                     .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
                     .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
 
         /**  Let all the trackable listeners know where the phone is.  */
-        for (VuforiaTrackable trackable : allTrackables) {
-            ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
-        }
+        // for (VuforiaTrackable trackable : allTrackables) {
+        //     ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
+        // }
 
         FTCOmniDriveAPI RIPSteve = new FTCOmniDriveAPI(hardwareMap);
 
         gamepad1.setJoystickDeadzone(0);
 
-
-        telemetry.addLine("Robot Initialized");
+        telemetry.addLine("Robot Status : Initialized");
         telemetry.update();
 
         waitForStart();
 
         targetsSkyStone.activate();
-        
-        
-        
-        
-        
-        
+
+
+
+
+
+
         while (opModeIsActive()) {
-            RIPSteve.driveOmni(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
-            // check all the trackable targets to see which one (if any) is visible.
-            telemetry.addData("Strafe Wheel inch", RIPSteve.getDistanceStrafe());
-            telemetry.addData("ave forward inch", RIPSteve.getDistanceStriaght());
-            telemetry.addData("totalDistance", RIPSteve.getDisPerPulse() * 1120);
-            telemetry.update();
-            
-            if (gamepad1.right_stick_y > 0) {
-              RIPSteve.driveStraight(.5f,24);
-            }
-            
-            
-            
-            
-            
-            
+            RIPSteve.driveOmniJoystick(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+            // telemetry.addData("Strafe Wheel inch", RIPSteve.getDistanceStrafe());
+            // telemetry.addData("ave forward inch", RIPSteve.getDistanceStraight());
+            // telemetry.addData("totalDistance", RIPSteve.getDisPerPulse() * 1120);
+            // telemetry.update();
+
+
+
+
+
+
             targetVisible = false;
             for (VuforiaTrackable trackable : allTrackables) {
                 if (((VuforiaTrackableDefaultListener)trackable.getListener()).isVisible()) {
@@ -244,6 +261,8 @@ public class TeleopMain extends LinearOpMode {
                         lastLocation = robotLocationTransform;
                     }
                     break;
+                } else {
+                  targetVisible = false;
                 }
             }
 
