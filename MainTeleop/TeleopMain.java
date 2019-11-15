@@ -70,7 +70,7 @@ public class TeleopMain extends LinearOpMode {
     private OpenGLMatrix lastLocation = null;
     private VuforiaLocalizer vuforia = null;
     private boolean targetVisible = false;
-    private float phoneXRotate    = 0;
+    private float phoneXRotate    = -90;
     private float phoneYRotate    = 0;
     private float phoneZRotate    = 0;
 
@@ -185,19 +185,6 @@ public class TeleopMain extends LinearOpMode {
         rear2.setLocation(OpenGLMatrix
                 .translation(halfField, -quadField, mmTargetHeight)
                 .multiplied(Orientation.getRotationMatrix(EXTRINSIC, XYZ, DEGREES, 90, 0, -90)));
-
-                telemetry.addLine("Robot Status : Setting Camera Rotation");
-                telemetry.update();
-
-        if (CAMERA_CHOICE == BACK) {
-            phoneYRotate = -90;
-        } else {
-            phoneYRotate = 90;
-        }
-
-        if (PHONE_IS_PORTRAIT) {
-            phoneXRotate = 90 ;
-        }
 
         telemetry.addLine("Robot Status : Declaring Some Constants");
         telemetry.update();
