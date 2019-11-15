@@ -6,7 +6,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Hardware;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-
 public class FTCOmniDriveAPI{
 
   //Outputs to wheel
@@ -14,6 +13,7 @@ public class FTCOmniDriveAPI{
   double rightMotorSpeed;
   double strafeMotorSpeed;
   double startFPosition;
+  double startSPosition;
 
   //Motors
   DcMotor leftMotor;
@@ -21,10 +21,10 @@ public class FTCOmniDriveAPI{
   DcMotor strafeMotor;
 
   //Variables used to calulate distance per pulse
-  private double DIAMETER = 4;
+  private double DIAMETER = 2;
   private double RADIUS = DIAMETER/2;
   private double PULSESPERROTATION = 1120;
-  private double circumference = 2*RADIUS*3.14159;
+  private double circumference = RADIUS*pi;
   double disPerPulse = circumference/PULSESPERROTATION;
 
   public FTCOmniDriveAPI(HardwareMap hwMap) {
@@ -83,7 +83,7 @@ public class FTCOmniDriveAPI{
   }
 
   public void driveOmni(float xSpeed, float ySpeed, float rotateSpeed) {
-    calculateWheelSpeeds(rotateSpeed, ySpeed, xSpeed);
+    calculateWheelSpeeds(xSpeed, ySpeed, rotateSpeed);
     this.rightMotor.setPower(rightMotorSpeed);
     this.leftMotor.setPower(leftMotorSpeed);
     this.strafeMotor.setPower(strafeMotorSpeed);
@@ -97,51 +97,70 @@ public class FTCOmniDriveAPI{
   }
 
   //Drives forward or backwards based on a power input infintely
-  public void driveStraight(float straightPower) {
+  public void driveStraight(double straightPower) {
     driveOmni(straightPower,0,0);
   }
 
   //Drives forward or backward to a certain distance at a power
-  public void driveStraight(float straightPower, double targetDistanceInch) {
+  public void driveStraight(double straightPower, double targetDistanceInch) {
     //Transform the encoder counts to start positions and finish positions
     this.startFPosition = getDistanceStraight();
     double totalDistance = getDistanceStraight() - this.startFPosition;
 
-    if (totalDistance >= 0) {
-      while (totalDistance >= 0) {
+    if(totalDistance >= 0) {
+      for( ; totalDistance >= 0; ) {
         driveOmni(straightPower,0,0);
         totalDistance = getDistanceStraight() - this.startFPosition;
       }
       stopMotors();
     } else {
-      while (totalDistance <= 0) {
-        if (straightPower > 0) {
+      for( ; totalDistance <= 0; ) {
+        if(straightPower > 0) {
           straightPower = -straightPower;
         }
         driveOmni(straightPower,0,0);
-        totalDistance = getDistanceStraight() - this.startFPosition;
+        totalDistance =  getDistanceStraight() - this.startFPosition;
       }
       stopMotors();
     }
   }
 
   //strafes forward or backwards based on a power input infintely
-  public void driveStrafe(float strafePower) {
+  public void driveStrafe(double strafePower) {
     driveOmni(0,strafePower,0);
   }
 
   //strafes forward or backward to a certain distance at a power
-  public void driveStrafe(float strafePower, float distanceInch) {
-    driveOmni(0,strafePower,0);
+  public void driveStrafe(double strafePower, double distanceInch) {
+
+    this.startSPosition = getDistanceStrafe();
+    double totalDistance = getDistanceStrafe() - this.startSPosition;
+
+    if(totalDistance >= 0) {
+      for( ; totalDistance >= 0; ) {
+        driveOmni(straightPower,0,0);
+        totalDistance = getDistanceStrafe() - this.startSPosition;
+      }
+      stopMotors();
+    } else {
+      for( ; totalDistance <= 0; ) {
+        if(straightPower > 0) {
+          straightPower = -straightPower;
+        }
+        driveOmni(straightPower,0,0);
+        totalDistance =  getDistanceStrafe() - this.startSPosition;
+      }
+      stopMotors();
+    }
   }
 
   //Rotates forward or backwards based on a power input infintely
-  public void driveRotate(float rotatePower) {
+  public void driveRotate(double rotatePower) {
     driveOmni(0,0,rotatePower);
   }
 
   //Rotates forward or backward to a angle at a power
-  public void driveRotate(float rotatePower, float angle) {
+  public void driveRotate(double rotatePower, double angle) {
     driveOmni(0,0,rotatePower);
   }
 
@@ -159,8 +178,8 @@ public class FTCOmniDriveAPI{
     return this.disPerPulse;
   }
 
-  public double getDistanceStraight() {
-    return ((-getDistance(this.leftMotor) + getDistance(this.rightMotor))/2);
+  public double getDistanceStriaght() {
+    return ((getDistance(this.leftMotor) + -getDistance(this.rightMotor))/2);
   }
 
   public double getDistanceStrafe() {
