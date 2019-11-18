@@ -17,6 +17,10 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 public class GyroscopeAPI {
     private BNO055IMU imu;
     private float xAngle, yAngle, zAngle;
+    float xAngleReset;
+    float yAngleReset;
+    float zAngleReset;
+    
 
     public GyroscopeAPI(HardwareMap hardwareMap) {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -71,15 +75,27 @@ public class GyroscopeAPI {
         return targetAngle;
     }
     
+    public void resetX(){
+        xAngleReset = xAngle;
+    }
+    
+    public void resetY(){
+        yAngleReset = yAngle;
+    }
+    
+    public void resetZ(){
+        zAngleReset = zAngle;
+    }
+    
     public float getX() {
-        return xAngle;
+        return xAngle-xAngleReset;
     }
     
     public float getY() {
-        return yAngle;
+        return yAngle-yAngleReset;
     }
     
     public float getZ() {
-        return zAngle;
+        return zAngle-zAngleReset;
     }
 }
