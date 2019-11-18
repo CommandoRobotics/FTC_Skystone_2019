@@ -24,6 +24,7 @@ import static org.firstinspires.ftc.robotcore.external.navigation.AxesReference.
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.FRONT;
 import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection.BACK;
 import org.firstinspires.ftc.teamcode.APIs.FTCOmniDriveAPI;
+import org.firstinspires.ftc.teamcode.APIs.CoordinateSystemAPI;
 
 @TeleOp(name="TeleopMain")
 
@@ -70,9 +71,12 @@ public class TeleopMain extends LinearOpMode {
     private OpenGLMatrix lastLocation = null;
     private VuforiaLocalizer vuforia = null;
     private boolean targetVisible = false;
-    private float phoneXRotate    = -90;
-    private float phoneYRotate    = 0;
-    private float phoneZRotate    = 0;
+    private float phoneXRotate    = 0f;
+    private float phoneYRotate    = -90f;
+    private float phoneZRotate    = 0f;
+    
+    double robotLocationX;
+    double robotLocationY;
 
     @Override
     public void runOpMode() {
@@ -202,12 +206,13 @@ public class TeleopMain extends LinearOpMode {
                     .translation(CAMERA_FORWARD_DISPLACEMENT, CAMERA_LEFT_DISPLACEMENT, CAMERA_VERTICAL_DISPLACEMENT)
                     .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
 
-        /**  Let all the trackable listeners know where the phone is.  */
+            /**  Let all the trackable listeners know where the phone is.  */
         // for (VuforiaTrackable trackable : allTrackables) {
         //     ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
         // }
 
         FTCOmniDriveAPI RIPSteve = new FTCOmniDriveAPI(hardwareMap);
+        CoordinateSystemAPI coordinateTest = new CoordinateSystemAPI(0.2);
 
         gamepad1.setJoystickDeadzone(0);
 
@@ -257,6 +262,8 @@ public class TeleopMain extends LinearOpMode {
             if (targetVisible) {
                 // express position (translation) of robot in inches.
                 VectorF translation = lastLocation.getTranslation();
+                robotLocationX = translation.get(0)/mmPerInch;
+                robotLocationY = translation.get(1)/mmPerInch;
                 telemetry.addData("Pos (in)", "{X, Y, Z} = %.1f, %.1f, %.1f",
                         translation.get(0) / mmPerInch, translation.get(1) / mmPerInch, translation.get(2) / mmPerInch);
 
@@ -267,6 +274,32 @@ public class TeleopMain extends LinearOpMode {
             else {
                 telemetry.addData("Visible Target", "none");
             }
+            
+            boolean isAPressed = false;
+            boolean activateAutoPilot = false;
+            
+            if(gamepad1.a){
+              if(isAPressed == false){
+                isAPressed = true;
+                if(activateAutoPilot){
+                  activateAutoPilot = false;
+                } else {
+                  activateAutoPilot = true;
+                }
+              }
+            } else {
+              isAPressed = false;
+            }
+            
+            coordinateTest.calculateCoordinates(robotLocationX, robotLocationY, RIPSteve.getRotation(), 40.0, -40.0, 0.0);
+            telemetry.addData("Left Power", coordinateTest.coordinatesLeftMotorPower());
+            telemetry.addData("Right Power", coordinateTest.coordinatesRightMotorPower());
+            telemetry.addData("Strafe Power", coordinateTest.coordinatesStrafeMotorPower());
+            if(activateAutoPilot){
+              telemetry.addLine("Auto Pilot Activated");
+              RIPSteve.controlChassis(-coordinateTest.coordinatesLeftMotorPower(), coordinateTest.coordinatesRightMotorPower(), coordinateTest.coordinatesStrafeMotorPower());
+            }
+            telemetry.addData("Robot rotation", RIPSteve.getRotation());
             telemetry.update();
         }
 
