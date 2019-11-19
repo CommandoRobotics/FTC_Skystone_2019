@@ -12,6 +12,7 @@ public class IntakeAPI{
   DcMotor rightElevatorMotor;
   DcMotor leftIntakeMotor;
   DcMotor rightIntakeMotor;
+  TouchSensor inTouch;
   
   double elevatorUpPower = .5;
   double elevatorDownPower = -.5;
@@ -20,9 +21,10 @@ public class IntakeAPI{
   
   public IntakeAPI(HardwareMap hwMap) {
     this.leftElevatorMotor = new hwMap.get(DcMotor.class, "leftElevator");
-    this..rightElevatorMotor = new hwMap.get(DcMotor.class, "rightElevator");
+    this.rightElevatorMotor = new hwMap.get(DcMotor.class, "rightElevator");
     this.leftIntakeMotor = new hwMap.get(DcMotor.class, "leftIntake");
     this.rightIntakeMotor = new hwMap.get(DcMotor.class, "rightIntake");
+    this.inTouch = new hwMap.get(TouchSensor.class, "intakeTouchSensor");
     
     this.letElevatorMotor.Direction = REVERSE;
     this.leftntakeMotor.Direction = REVERSE;
@@ -67,16 +69,26 @@ public class IntakeAPI{
     this.rightElevatorMotor.setPower(0);
   }
   
-  //Controls the Intake motors to run at a certain power either + or -
+  //Controls the Intake motors to run at a certain power either + (in) or - (out)
   public void controlIntake(double power) {
-    this.leftIntakeMotor.setPower(power);
-    this.rightIntakeMotor.setPower(power);
+    if (this.inTouch.isPressed() && power>0) {
+        this.leftIntakeMotor.setPower(0);
+        this.rightIntakeMotor.setPower(0);
+    } else {
+        this.leftIntakeMotor.setPower(power);
+        this.rightIntakeMotor.setPower(power);
+    }
   }
   
   //Runs the Intake at a set speed inwards (collecting)
   public void intakeIn() {
-    this.leftIntakeMotor.setPower(this.inPower);
-    this.rightIntakeMotor.setPower(this.inPower);
+    if (this.inTouch.isPressed()) {
+        this.leftIntakeMotor.setPower(0);
+        this.rightIntakeMotor.setPower(0);
+    } else {
+        this.leftIntakeMotor.setPower(this.inPower);
+        this.rightIntakeMotor.setPower(this.inPower);
+    }
   }
   
   //Runs the Intake at a set speed outwards (scoring)
@@ -119,5 +131,10 @@ public class IntakeAPI{
   //Returns the set Intake out power
   public double getIntakeOutPower() {
     return this.outPower;
+  }
+  
+  //Tells us if a stone is in the intake
+  public boolean isStoneInIntake() {
+    return this.inTouch.isPressed();
   }
 }
