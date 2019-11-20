@@ -189,39 +189,21 @@ public class FTCOmniDriveAPI{
   public double getRotation() {
     gyro.update();
     double rawAngle = -gyro.getZ();
-    double divisionFactor;
-    double testPoint;
+    double reducedAngle;
     double modifiedAngle;
-    if(rawAngle > 0){
-      if(rawAngle > 360){
-        divisionFactor = rawAngle/360;
-        testPoint = Math.round(divisionFactor);
-        if(testPoint < divisionFactor){
-          divisionFactor = testPoint;
-        } else {
-          divisionFactor = testPoint-1;
-        }
-        modifiedAngle = rawAngle-(divisionFactor*360);
-      } else {
-        modifiedAngle = rawAngle;
-      }
-    } else if(rawAngle < 0){
-      if(rawAngle < -360){
-        divisionFactor = rawAngle/360;
-        testPoint = Math.round(divisionFactor);
-        if(testPoint < divisionFactor){
-          divisionFactor = testPoint;
-        } else {
-          divisionFactor = testPoint-1;
-        }
-        modifiedAngle = rawAngle-(divisionFactor*360);
-        modifiedAngle = 360-modifiedAngle;
-      } else {
-        modifiedAngle = rawAngle;
-      }
+
+    if(Math.abs(rawAngle) > 360){
+      reducedAngle = rawAngle%360;
     } else {
-      modifiedAngle = rawAngle;
+      reducedAngle = rawAngle;
     }
+
+    if(reducedAngle < 0){
+      modifiedAngle = 360-reducedAngle;
+    } else {
+      modifiedAngle = reducedAngle;
+    }
+    
     return modifiedAngle;
   }
 }
