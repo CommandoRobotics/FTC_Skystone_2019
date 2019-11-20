@@ -1,2 +1,2 @@
-# FTC_Skystone_2020
-The official code repository for FTC 9898's 2020 code
+# FTC_Skystone_2019
+The official code repository for FTC 6042's 2019 code
