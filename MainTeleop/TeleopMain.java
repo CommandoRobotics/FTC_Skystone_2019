@@ -74,7 +74,7 @@ public class TeleopMain extends LinearOpMode {
     private float phoneXRotate    = 0f;
     private float phoneYRotate    = -90f;
     private float phoneZRotate    = 0f;
-    
+
     double robotLocationX;
     double robotLocationY;
 
@@ -274,10 +274,10 @@ public class TeleopMain extends LinearOpMode {
             else {
                 telemetry.addData("Visible Target", "none");
             }
-            
+
             boolean isAPressed = false;
             boolean activateAutoPilot = false;
-            
+
             if(gamepad1.a){
               if(isAPressed == false){
                 isAPressed = true;
@@ -290,8 +290,8 @@ public class TeleopMain extends LinearOpMode {
             } else {
               isAPressed = false;
             }
-            
-            coordinateTest.calculateCoordinates(robotLocationX, robotLocationY, RIPSteve.getRotation(), 40.0, -40.0, 0.0);
+
+            coordinateTest.calculateCoordinates(robotLocationX, robotLocationY, RIPSteve.getRotation(), 0.0, 0.0, 0.0);
             telemetry.addData("Left Power", coordinateTest.coordinatesLeftMotorPower());
             telemetry.addData("Right Power", coordinateTest.coordinatesRightMotorPower());
             telemetry.addData("Strafe Power", coordinateTest.coordinatesStrafeMotorPower());
