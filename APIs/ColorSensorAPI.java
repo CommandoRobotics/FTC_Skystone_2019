@@ -1,43 +1,39 @@
+package org.firstinspires.ftc.teamcode.APIs;
+
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.Hardware;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.HardwareDevice.ColorSensor;
 
-public class ColorSensorAPI {
-  
+public class ColorSensorAPI extends ColorSensor {
+
   ColorSensor color;
-  double[3] getRGBValue;
-  
-  
-  public ColorSensorAPI() {
-    color = new ColorSensor();
-    color.enableLed(true);
 
+  public ColorSensorAPI(HardwareMap hwMap, String sensorName) {
+    color = new hwMap.get(ColorSensor.class, sensorName);
   }
-  
-  public double[] getRGBValue() {
-    this.getRGBValue[0] = colorsensor.int red();
-    this.getRGBValue[1] = colorsensor.int green();
-    this.getRGBValue[2] = colorsensor.int blue();
-    this.system.out.println(getRGBValue[0], getRGBValue[1], getRGBValue[2]);
+
+  public boolean isBlack() {
+    if (color.red() < 10 && color.blue() < 10 && color.green() < 10) {
+      return true;
+    } else {
+      return false;
+    }
   }
-  
-  public void int red() {
-    return this.colorSensor.red();
+
+  public boolean isYellow() {
+    if ((color.red() > 210 && color.red() > 190) && (color.green > 170 && color.green < 195) && color.blue() < 50) {
+      return true;
+    } else {
+      return false;
+    }
   }
-  
-  public void int green() {
-    return this.colorSensor.green();
-  }
-  
-  public void int blue() {
-    return this.colorSensor.blue();
-  }
-  
-  public void int isYellow() {
-    
-    
-  }
-  public void int isBlack() {
-    
-    
+
+  public boolean isSkystoneDetected() {
+    if (color.isBlack() && !color.isYellow()) {
+      return true;
+    } else {
+      return false;
   }
 }
