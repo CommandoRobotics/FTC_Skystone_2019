@@ -275,31 +275,6 @@ public class BishopKelleyQualifier extends LinearOpMode {
                 telemetry.addData("Visible Target", "none");
             }
 
-            boolean isAPressed = false;
-            boolean activateAutoPilot = false;
-
-            if(gamepad1.a){
-              if(isAPressed == false){
-                isAPressed = true;
-                if(activateAutoPilot){
-                  activateAutoPilot = false;
-                } else {
-                  activateAutoPilot = true;
-                }
-              }
-            } else {
-              isAPressed = false;
-            }
-
-            coordinateSystem.calculateCoordinates(robotLocationX, robotLocationY, 90, 0.0, 0.0, 0.0);
-            //coordinateSystem.calculateCoordinates(robotLocationX, robotLocationY, robot.getRotation(), 0.0, 0.0, 0.0);
-            telemetry.addData("Left Power", coordinateSystem.coordinatesLeftMotorPower());
-            telemetry.addData("Right Power", coordinateSystem.coordinatesRightMotorPower());
-            telemetry.addData("Strafe Power", coordinateSystem.coordinatesStrafeMotorPower());
-            if(activateAutoPilot){
-              telemetry.addLine("Auto Pilot Activated");
-              robot.controlChassis(coordinateSystem.coordinatesLeftMotorPower(), -coordinateSystem.coordinatesRightMotorPower(), coordinateSystem.coordinatesStrafeMotorPower());
-            }
             telemetry.addData("Robot rotation", robot.getRotation());
             telemetry.update();
         }
