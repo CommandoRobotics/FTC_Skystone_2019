@@ -27,7 +27,7 @@ public class IntakeAPI{
   private double DIAMETER = 2;
   private double RADIUS = DIAMETER/2;
   private double PULSESPERROTATION = 1120;
-  private double circumference = RADIUS*3.1459;
+  private double circumference = RADIUS*3.14159;
   double disPerPulse = circumference/PULSESPERROTATION;
 
   public IntakeAPI(HardwareMap hwMap) {
@@ -59,13 +59,15 @@ public class IntakeAPI{
   }
 
   //For later. The goal is to be able to set a height and the motors will move there using encoders. Pretty simple
-  public boolean setHeight(double power, double targetHeight) {
+  public boolean setHeight(double power, double targetHeight, Telemetry telemetry) {
     currentHeight = calculateHeight();
     totalDistance = Math.abs(targetHeight - currentHeight);
     power = Math.abs(power);
     boolean finished = false;
     if (targetHeight >= MAXHEIGHT) {
-      finished = true;
+      stopElevator();
+	  finished = true;
+	  telemetry.addLine("setHeight() FAILED: Height set over max height");
     } else if (currentHeight > targetHeight && totalDistance > .5 && !finished) {
       controlElevator(-power);
       finished = false;
@@ -77,6 +79,8 @@ public class IntakeAPI{
       finished = true;
     }
     return finished;
+	if (finished) {
+	telemetry.addData("Target height: ", targetHeight];
   }
 
   //Sets the Elevator all the way back to the ground using encoder values
