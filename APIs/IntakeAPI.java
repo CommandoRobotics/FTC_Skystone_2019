@@ -78,24 +78,50 @@ public class IntakeAPI{
       stopElevator();
       finished = true;
     }
-    return finished;
+	
 	if (finished) {
-	telemetry.addData("Target height: ", targetHeight];
+		telemetry.addLine("Elevator Height Complete/Reached");
+	} else {
+		telemetry.addData("Target height: ", targetHeight);
+		telemetry.addData("Current height: ", calculateHeight());
+	}
+	return finished;
   }
 
   //Sets the Elevator all the way back to the ground using encoder values
   //(designed to be run on a toggle button)
   public boolean resetElevator() {
     double currentHeight = calculateHeight();
-    boolean returnTrue = false;
+    boolean finished = false;
     if (currentHeight > 2) {
       elevatorDown();
-      returnTrue = false;
+      finished = false;
     } else if(currentHeight <= .5) {
       stopElevator();
-      returnTrue = true;
+      finished = true;
     }
-    return returnTrue;
+    return finished;
+  }
+  
+  //Same thing but with telemetry outputs
+  public boolean resetElevator(Telemetry, telemetry) {
+    double currentHeight = calculateHeight();
+    boolean finished = false;
+    if (currentHeight > 2) {
+      elevatorDown();
+      finished = false;
+    } else if(currentHeight <= .5) {
+      stopElevator();
+      finished = true;
+    }
+	
+	if (finished) {
+		telemetry.addLine("Elevator Height Complete/Reached");
+	} else {
+		telemetry.addData("Target height: ", 0);
+		telemetry.addData("Current height: ", calculateHeight());
+	}
+    return finished;
   }
 
   //Forces the elevator up at a certain power no matter the signage of the inupt
