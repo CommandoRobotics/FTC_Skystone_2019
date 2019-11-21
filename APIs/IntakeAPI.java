@@ -22,12 +22,12 @@ public class IntakeAPI{
   private final double MAXHEIGHT = 0;
   double currentHeight;
   double totalDistance;
-
+ 
   //values used for encoders
   private double DIAMETER = 2;
   private double RADIUS = DIAMETER/2;
   private double PULSESPERROTATION = 1120;
-  private double circumference = RADIUS*3.1459;
+  private double circumference = RADIUS*3.14159;
   double disPerPulse = circumference/PULSESPERROTATION;
 
   public IntakeAPI(HardwareMap hwMap) {
@@ -59,13 +59,15 @@ public class IntakeAPI{
   }
 
   //For later. The goal is to be able to set a height and the motors will move there using encoders. Pretty simple
-  public boolean setHeight(double power, double targetHeight) {
+  public boolean setHeight(double power, double targetHeight, Telemetry telemetry) {
     currentHeight = calculateHeight();
     totalDistance = Math.abs(targetHeight - currentHeight);
     power = Math.abs(power);
     boolean finished = false;
     if (targetHeight >= MAXHEIGHT) {
-      finished = true;
+      stopElevator();
+	  finished = true;
+	  telemetry.addLine("setHeight() FAILED: Height set over max height");
     } else if (currentHeight > targetHeight && totalDistance > .5 && !finished) {
       controlElevator(-power);
       finished = false;
@@ -76,22 +78,50 @@ public class IntakeAPI{
       stopElevator();
       finished = true;
     }
-    return finished;
+	
+	if (finished) {
+		telemetry.addLine("Elevator Height Complete/Reached");
+	} else {
+		telemetry.addData("Target height: ", targetHeight);
+		telemetry.addData("Current height: ", calculateHeight());
+	}
+	return finished;
   }
 
   //Sets the Elevator all the way back to the ground using encoder values
   //(designed to be run on a toggle button)
   public boolean resetElevator() {
     double currentHeight = calculateHeight();
-    boolean returnTrue = false;
+    boolean finished = false;
     if (currentHeight > 2) {
       elevatorDown();
-      returnTrue = false;
+      finished = false;
     } else if(currentHeight <= .5) {
       stopElevator();
-      returnTrue = true;
+      finished = true;
     }
-    return returnTrue;
+    return finished;
+  }
+  
+  //Same thing but with telemetry output
+  public boolean resetElevator(Telemetry, telemetry) {
+    double currentHeight = calculateHeight();
+    boolean finished = false;
+    if (currentHeight > 2) {
+      elevatorDown();
+      finished = false;
+    } else if(currentHeight <= .5) {
+      stopElevator();
+      finished = true;
+    }
+	
+	if (finished) {
+		telemetry.addLine("Elevator Height Complete/Reached");
+	} else {
+		telemetry.addData("Target height: ", 0);
+		telemetry.addData("Current height: ", calculateHeight());
+	}
+    return finished;
   }
 
   //Forces the elevator up at a certain power no matter the signage of the inupt
