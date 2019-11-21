@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.APIs;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -22,7 +23,7 @@ public class IntakeAPI{
   private final double MAXHEIGHT = 0;
   double currentHeight;
   double totalDistance;
- 
+
   //values used for encoders
   private double DIAMETER = 2;
   private double RADIUS = DIAMETER/2;
@@ -78,7 +79,7 @@ public class IntakeAPI{
       stopElevator();
       finished = true;
     }
-	
+
 	if (finished) {
 		telemetry.addLine("Elevator Height Complete/Reached");
 	} else {
@@ -102,9 +103,9 @@ public class IntakeAPI{
     }
     return finished;
   }
-  
+
   //Same thing but with telemetry output
-  public boolean resetElevator(Telemetry, telemetry) {
+  public boolean resetElevator(Telemetry telemetry) {
     double currentHeight = calculateHeight();
     boolean finished = false;
     if (currentHeight > 2) {
@@ -114,7 +115,7 @@ public class IntakeAPI{
       stopElevator();
       finished = true;
     }
-	
+
 	if (finished) {
 		telemetry.addLine("Elevator Height Complete/Reached");
 	} else {
