@@ -22,7 +22,7 @@ public class IntakeAPI{
   private final double MAXHEIGHT = 0;
   double currentHeight;
   double totalDistance;
-
+ 
   //values used for encoders
   private double DIAMETER = 2;
   private double RADIUS = DIAMETER/2;
@@ -103,7 +103,7 @@ public class IntakeAPI{
     return finished;
   }
   
-  //Same thing but with telemetry outputs
+  //Same thing but with telemetry output
   public boolean resetElevator(Telemetry, telemetry) {
     double currentHeight = calculateHeight();
     boolean finished = false;
