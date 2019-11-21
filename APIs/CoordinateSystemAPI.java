@@ -22,68 +22,23 @@ public class CoordinateSystemAPI {
         double yAxisMultipliedInput = yAxisDistance;
 
         double goldenRatio;
+        double newCurrentHeading;
 
-        boolean xIsGreater = false;
-        boolean yIsGreater = false;
+        //Calculate the radius of the circle using the distance formula
+        double radiusOfCircle = Math.sqrt(Math.pow(xAxisMultipliedInput-targetX, 2)+Math.pow(yAxisMultipliedInput-targetY, 2));
 
-        double radiusOfCircle = Math.sqrt(Math.pow(xAxisMultipliedInput, 2)+Math.pow(yAxisMultipliedInput, 2));
-
-        double xAxisControllerInput = Math.toDegrees(radiusOfCircle*Math.cos(Math.toRadians(currentHeading+180)));
-        double yAxisControllerInput = Math.toDegrees(radiusOfCircle*Math.sin(Math.toRadians(currentHeading+180)));
-
-        if(Math.abs(xAxisControllerInput) > Math.abs(yAxisControllerInput)){
-            goldenRatio = yAxisControllerInput/xAxisControllerInput;
-            xIsGreater = true;
-        } else if(Math.abs(yAxisControllerInput) > Math.abs(xAxisControllerInput)){
-            goldenRatio = xAxisControllerInput/yAxisControllerInput;
-            yIsGreater = true;
+        //Flip the heading 180 degrees
+        if(currentHeading+180 > 360){
+            newCurrentHeading = currentHeading-180;
         } else {
-            goldenRatio = 1;
-            xIsGreater = false;
-            yIsGreater = false;
+            newCurrentHeading = currentHeading+180;
         }
 
-        if(xIsGreater){
-            if(xAxisControllerInput > 1){
-                xAxisControllerInput = 1;
-                if(yAxisControllerInput > 0){
-                    yAxisControllerInput = goldenRatio*1;
-                } else if(xAxisControllerInput < 0){
-                    yAxisControllerInput = goldenRatio*-1;
-                }
-            } else if(xAxisControllerInput < -1){
-                xAxisControllerInput = -1;
-                if(yAxisControllerInput > 0){
-                    yAxisControllerInput = goldenRatio*1;
-                } else if(xAxisControllerInput < 0){
-                    yAxisControllerInput = goldenRatio*-1;
-                }
-            }
-        } else if(yIsGreater){
-            if(yAxisControllerInput > 1){
-                yAxisControllerInput = 1;
-                if(xAxisControllerInput > 0){
-                    xAxisControllerInput = goldenRatio*1;
-                } else if(yAxisControllerInput < 0){
-                    xAxisControllerInput = goldenRatio*-1;
-                }
-            } else if(yAxisControllerInput < -1){
-                yAxisControllerInput = -1;
-                if(xAxisControllerInput > 0){
-                    xAxisControllerInput = goldenRatio*1;
-                } else if(yAxisControllerInput < 0){
-                    xAxisControllerInput = goldenRatio*-1;
-                }
-            }
-        } else {
-            if(xAxisControllerInput > 1){
-                xAxisControllerInput = 1;
-                yAxisControllerInput = 1;
-            } else if(xAxisControllerInput < -1){
-                xAxisControllerInput = -1;
-                yAxisControllerInput = -1;
-            }
-        }
+        //Find the x and y value of the target point after it has been moved to the correct angle
+        double xAxisControllerInput = radiusOfCircle*(Math.toDegrees(Math.cos(Math.toRadians(newCurrentHeading))));
+        double yAxisControllerInput = radiusOfCircle*(Math.toDegrees(Math.sin(Math.toRadians(newCurrentHeading))));
+
+
 
         leftMotorPower = yAxisControllerInput;
         rightMotorPower = yAxisControllerInput;
