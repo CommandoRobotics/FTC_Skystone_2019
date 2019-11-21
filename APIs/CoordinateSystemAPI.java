@@ -15,6 +15,9 @@ public class CoordinateSystemAPI {
     }
 
     public void calculateCoordinates(double currentX, double currentY, double currentHeading, double targetX, double targetY, double targetHeading){
+
+        private static final double X_AXIS_SCALE = 6000;
+        private static final double Y_AXIS_SCALE = 1000;
         double xAxisDistance = targetX-currentX;
         double yAxisDistance = targetY-currentY;
 
@@ -38,7 +41,15 @@ public class CoordinateSystemAPI {
         double xAxisControllerInput = radiusOfCircle*(Math.toDegrees(Math.cos(Math.toRadians(newCurrentHeading))));
         double yAxisControllerInput = radiusOfCircle*(Math.toDegrees(Math.sin(Math.toRadians(newCurrentHeading))));
 
-
+        if(xAxisControllerInput > yAxisControllerInput){
+          goldenRatio = yAxisControllerInput/xAxisControllerInput;
+          xAxisControllerInput = xAxisControllerInput/X_AXIS_SCALE;
+          yAxisControllerInput = yAxisControllerInput*goldenRatio;
+        } else if(yAxisControllerInput > xAxisControllerInput){
+          goldenRatio = xAxisControllerInput/yAxisControllerInput;
+          yAxisControllerInput = yAxisControllerInput/Y_AXIS_SCALE;
+          xAxisControllerInput = xAxisControllerInput*goldenRatio;
+        }
 
         leftMotorPower = yAxisControllerInput;
         rightMotorPower = yAxisControllerInput;
