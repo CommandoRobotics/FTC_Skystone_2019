@@ -297,7 +297,7 @@ public class TeleopMain extends LinearOpMode {
             telemetry.addData("Strafe Power", coordinateTest.coordinatesStrafeMotorPower());
             if(activateAutoPilot){
               telemetry.addLine("Auto Pilot Activated");
-              RIPSteve.controlChassis(-coordinateTest.coordinatesLeftMotorPower(), coordinateTest.coordinatesRightMotorPower(), coordinateTest.coordinatesStrafeMotorPower());
+              RIPSteve.controlChassis(coordinateTest.coordinatesLeftMotorPower(), -coordinateTest.coordinatesRightMotorPower(), coordinateTest.coordinatesStrafeMotorPower());
             }
             telemetry.addData("Robot rotation", RIPSteve.getRotation());
             telemetry.update();
