@@ -14,7 +14,7 @@ public class CoordinateSystemAPI {
         minimumWheelSpeed = minSpeed;
     }
 
-    public void calculateCoordinates(double currentX, double currentY, double currentHeading, double targetX, double targetY, double targetHeading){
+    public void calculateCoordinates(double currentX, double currentY, double targetX, double targetY){
         double xAxisDistance = targetX-currentX;
         double yAxisDistance = targetY-currentY;
 
