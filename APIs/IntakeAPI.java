@@ -82,7 +82,7 @@ public class IntakeAPI{
     }
 	
 	  if (finished) {
-		  telemetry.addLine("Elevator Height Complete/Reached");
+		  telemetry.addLine("setHeight() COMPLETE");
 	  } else {
 		  telemetry.addData("Target height: ", targetHeight);
 		  telemetry.addData("Current height: ", calculateHeight());

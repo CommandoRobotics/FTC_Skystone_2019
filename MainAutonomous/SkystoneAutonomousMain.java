@@ -28,7 +28,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous
 
-public class ENCODERCraterRoverRuckusAutonomous extends LinearOpMode {
+public class SkystoneAutonomousMain extends LinearOpMode {
 
     //private static final int SAMPLE_TIME_ADDITION = 4000;
     //private static final int SAMPLE_START_DELAY = 1000;
@@ -52,35 +52,59 @@ public class ENCODERCraterRoverRuckusAutonomous extends LinearOpMode {
       }
       
       //move forward x inches from start postition
-      finished = chassis.driveStraight(.4,16);
+	  telemetry.addLine("Driving to Foundation");
+	  chassis.setTargetStraightPosition(16);
+      finished = chassis.driveStraightEnc(.4);
+	  telemetry.update();
+	  
       while (!finished) {
-        finished = chassis.driveStraight(.4,16);
+		telemetry.addLine("Driving to Foundation");
+        finished = chassis.driveStraightEnc(.4);
+		telemetry.update();
       }
       
       //move to the right to be in front of the foundation
-      finished = chassis.driveStrafe(.4,60);
+	  telemetry.addLine("Driving to Foundation");
+	  chassis.setTargetStrafePosition(60);
+      finished = chassis.driveStrafeEnc(.4);
+	  telemetry.update();
+	  
       while (!finished) {
-        finished = .driveStrafe(.4,60);
+		telemetry.addLine("Driving to Foundation");
+        finished = chassis.driveStrafeEnc(.4);
+		telemetry.update();
       }
       
       //drive up to foundation and raise elevator
-      finished = chassis.driveStraight(.4,10) && intake.setHeight(.5,5);
+	  telemetry.addLine("Driving to Foundation");
+	  chassis.setTargetStraightPosition(10);
+      finished = chassis.driveStraightEnc(.4) && intake.setHeight(.5,5);
+	  telemetry.update();
+	  
       while (!finished) {
-        finished = chassis.driveStraight(.4,10) && intake.setHeight(.5,5);
+		telemetry.addLine("Driving to Foundation");
+        finished = chassis.driveStraightEnc(.4) && intake.setHeight(.5,5);
+		telemetry.update();
       }
       
       //shoot the stone out of the robot
+	  telemetry.addLine("Placing Stone");
       startTimeMilis = System.currentTimeMillis();
       timeElapsed = System.currentTimeMillis() - startTimeMilis;
+	  telemetry.update();
+	  
       while (timeElapsed < 1) {
         intake.intakeIn();
+		timeElapsed = System.currentTimeMillis() - startTimeMilis;
       }
       intake.stopIntake();
       
       //back away from foundation, pulling it with you
-      finished = chassis.driveStraight(.4,-20);
+	  chassis.setTargetStraightPosition(-20);
+      finished = chassis.driveStraightEnc(.4);
+	  
       while (!finished) {
-        finished = chassis.driveStraight(.4,-20);
+        finished = chassis.driveStraightEnc(.4);
       }
       
       //drive to postiiton to sample

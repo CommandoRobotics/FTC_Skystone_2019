@@ -5,38 +5,45 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Hardware;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.teamcode.APIs.*;
-
 
 public class FTCOmniDriveAPI{
 
   //Outputs to wheel
-  public double leftMotorSpeed;
-  public double rightMotorSpeed;
-  public double strafeMotorSpeed;
-  public double startFPosition;
-
-  //Motors + Gyro
+  double leftMotorSpeed;
+  double rightMotorSpeed;
+  double strafeMotorSpeed;
+  double startFPosition;
+  double startSPosition;
+  double targetFPosition;
+  double targetSPosition;
+  
+  //Motors
   DcMotor leftMotor;
   DcMotor rightMotor;
   DcMotor strafeMotor;
-  GyroscopeAPI gyro;
-
+  
+  //Color Sensors
+  ColorSensorAPI leftFColor;
+  ColorSensorAPI rightFColor;
+  ColorSensorAPI undersideColor;
+  
   //Variables used to calulate distance per pulse
-  private double DIAMETER = 4;
+  private double DIAMETER = 2;
   private double RADIUS = DIAMETER/2;
   private double PULSESPERROTATION = 1120;
-  private double circumference = 2*RADIUS*3.14159;
+  private double circumference = RADIUS*pi;
   double disPerPulse = circumference/PULSESPERROTATION;
-
+  
   public FTCOmniDriveAPI(HardwareMap hwMap) {
     this.leftMotor = hwMap.get(DcMotor.class, "leftDrive");
     this.rightMotor = hwMap.get(DcMotor.class, "rightDrive");
     this.strafeMotor = hwMap.get(DcMotor.class, "strafeDrive");
-    gyro = new GyroscopeAPI(hwMap);
+    this.rightFColor = new ColorSensorAPI(hwMap, "frontRightColorSensor");
+    this.leftFColor = new ColorSensorAPI(hwMap, "frontLeftColorSensor");
+    this.undersideColor = new ColorSensorAPI(hwMap, "undersideColorSensor");
   }
-
-
+  
+  
   //Creates the OmniDrive mathematical outputs for all motors based on an two x inputs and a y input or 3 values: Forward, Strafe, and Rotation
   public void calculateWheelSpeeds(float joystick1x, float joystick1y, float joystick2x) {
     //create 3D inputs based on joystick coordinates
@@ -71,13 +78,12 @@ public class FTCOmniDriveAPI{
       }
     }
 
-
     leftMotorSpeed = targetLeftMotorSpeed;
     rightMotorSpeed = targetRightMotorSpeed;
-    strafeMotorSpeed = -targetStrafeMotorSpeed;
+    strafeMotorSpeed = targetStrafeMotorSpeed;
 
   }
-
+  
   //Cnotrol the chassis as an omni drive using joystick inputs
   public void driveOmniJoystick(float leftJoystickX, float leftJoystickY, float rightJoystickX) {
     calculateWheelSpeeds(leftJoystickX, -rightJoystickX, -leftJoystickY);
@@ -85,70 +91,107 @@ public class FTCOmniDriveAPI{
     this.leftMotor.setPower(leftMotorSpeed);
     this.strafeMotor.setPower(strafeMotorSpeed);
   }
-
+  
   public void driveOmni(float xSpeed, float ySpeed, float rotateSpeed) {
-    calculateWheelSpeeds(rotateSpeed, ySpeed, xSpeed);
+    calculateWheelSpeeds(xSpeed, ySpeed, rotateSpeed);
     this.rightMotor.setPower(rightMotorSpeed);
     this.leftMotor.setPower(leftMotorSpeed);
     this.strafeMotor.setPower(strafeMotorSpeed);
   }
-
+  
   //Allows you to control each part of the robot's chassis
   public void controlChassis(double leftPower, double rightPower, double strafePower) {
     this.rightMotor.setPower(rightPower);
     this.leftMotor.setPower(leftPower);
     this.strafeMotor.setPower(strafePower);
   }
-
+  
   //Drives forward or backwards based on a power input infintely
-  public void driveStraight(float straightPower) {
+  public void driveStraight(double straightPower) {
     driveOmni(straightPower,0,0);
   }
-
+  
+  public void setTargetStraightPosition(double targetDistanceInch) {
+    this.targetFPosition = getDistanceStraight() + targetDistanceInch;
+  }
   //Drives forward or backward to a certain distance at a power
-  public void driveStraight(float straightPower, double targetDistanceInch) {
+  //meant to be run continuously
+  public boolean driveStraightEnc(double straightPower) {
     //Transform the encoder counts to start positions and finish positions
-    this.startFPosition = getDistanceStraight();
-    double totalDistance = getDistanceStraight() - this.startFPosition;
+    double totalDistance = targetFPosition - getDistanceStraight();
+	straightPower = Math.abs(straightPower);
 
-    if (totalDistance >= 0) {
-      while (totalDistance >= 0) {
-        driveOmni(straightPower,0,0);
-        totalDistance = getDistanceStraight() - this.startFPosition;
-      }
-      stopMotors();
+    if(totalDistance >= 0) {
+        if (totalDistance <= .1 && totalDistance >= -.1) {
+          stopMotors();
+		  telemetry.addLine("driveSraightEnc() COMPLETE");
+          return true;
+        } else {
+          driveOmni(straightPower,0,0);
+          telemetry.addData("Distance Left to Drive: ", totalDistance);
+          return false;
     } else {
-      while (totalDistance <= 0) {
-        if (straightPower > 0) {
-          straightPower = -straightPower;
+        if (totalDistance <= .1 && totalDistance >= -.1) {
+          stopMotors();
+		  telemetry.addLine("driveSraightEnc() COMPLETE");
+          return true;
+        } else {
+          driveOmni(-straightPower,0,0);
+          telemetry.addData("Distance Left to Drive: ", totalDistance);
+          return false;
         }
-        driveOmni(straightPower,0,0);
-        totalDistance = getDistanceStraight() - this.startFPosition;
-      }
-      stopMotors();
     }
   }
-
+  
+  public void driveStraightPI(
+  
   //strafes forward or backwards based on a power input infintely
-  public void driveStrafe(float strafePower) {
+  public void driveStrafe(double strafePower) {
     driveOmni(0,strafePower,0);
   }
-
-  //strafes forward or backward to a certain distance at a power
-  public void driveStrafe(float strafePower, float distanceInch) {
-    driveOmni(0,strafePower,0);
+  
+ public void setTargetStrafePosition(double targetDistanceInch) {
+    this.targetSPosition = getDistanceStrafe() + targetDistanceInch;
   }
-
+  //Drives forward or backward to a certain distance at a power
+  //meant to be run continuously
+  public boolean driveStrafeEnc(double strafePower) {
+    //Transform the encoder counts to start positions and finish positions
+    double totalDistance = targetSPosition - getDistanceStrafe();
+	strafePower = Math.abs(strafePower);
+    
+    if(totalDistance >= 0) {
+        if (totalDistance <= .1 && totalDistance >= -.1) {
+          stopMotors();
+		  telemetry.addLine("driveSrafeEnc() COMPLETE");
+          return true;
+        } else {
+          driveOmni(strafePower,0,0);
+          telemetry.addData("Distance Left to Strafe: ", totalDistance);
+          return false;
+    } else {
+        if (totalDistance <= .1 && totalDistance >= -.1) {
+          stopMotors();
+		  telemetry.addLine("driveSrafeEnc() COMPLETE");
+          return true;
+        } else {
+          driveOmni(-strafePower,0,0);
+          telemetry.addData("Distance Left to Strafe: ", totalDistance);
+          return false;
+        }
+    }
+  }
+  
   //Rotates forward or backwards based on a power input infintely
-  public void driveRotate(float rotatePower) {
+  public void driveRotate(double rotatePower) {
     driveOmni(0,0,rotatePower);
   }
 
   //Rotates forward or backward to a angle at a power
-  public void driveRotate(float rotatePower, float angle) {
+  public void driveRotate(double rotatePower, double angle) {
     driveOmni(0,0,rotatePower);
   }
-
+  
   private double getDistance(DcMotor motor) {
     return motor.getCurrentPosition() * this.disPerPulse;
   }
@@ -158,52 +201,31 @@ public class FTCOmniDriveAPI{
     this.leftMotor.setPower(0);
     this.strafeMotor.setPower(0);
   }
-
+  
   public double getDisPerPulse() {
     return this.disPerPulse;
   }
-
-  public double getDistanceStraight() {
-    return ((-getDistance(this.leftMotor) + getDistance(this.rightMotor))/2);
+  
+  public double getDistanceStriaght() {
+    return ((getDistance(this.leftMotor) + -getDistance(this.rightMotor))/2);
   }
-
+  
   public double getDistanceStrafe() {
     return getDistance(this.strafeMotor);
   }
-
+  
   public double getAngleRotate() {
     return 0;
   }
-  public double getLeftMotorSpeed() {
+  public double getLeftMotorSpeed(){
     return this.leftMotorSpeed;
   }
 
-  public double getRightMotorSpeed() {
+  public double getRightMotorSpeed(){
     return this.rightMotorSpeed;
   }
 
-  public double getStrafeMotorSpeed() {
+  public double getStrafeMotorSpeed(){
     return this.strafeMotorSpeed;
-  }
-
-  public double getRotation() {
-    gyro.update();
-    double rawAngle = -gyro.getZ();
-    double reducedAngle;
-    double modifiedAngle;
-
-    if(Math.abs(rawAngle) > 360){
-      reducedAngle = rawAngle%360;
-    } else {
-      reducedAngle = rawAngle;
-    }
-
-    if(reducedAngle < 0){
-      modifiedAngle = 360-reducedAngle;
-    } else {
-      modifiedAngle = reducedAngle;
-    }
-    
-    return modifiedAngle;
   }
 }
