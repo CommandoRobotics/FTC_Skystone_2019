@@ -52,29 +52,47 @@ public class SkystoneAutonomousMain extends LinearOpMode {
       }
       
       //move forward x inches from start postition
+	  telemetry.addLine("Driving to Foundation");
 	  chassis.setTargetStraightPosition(16);
       finished = chassis.driveStraightEnc(.4);
+	  telemetry.update();
+	  
       while (!finished) {
+		telemetry.addLine("Driving to Foundation");
         finished = chassis.driveStraightEnc(.4);
+		telemetry.update();
       }
       
       //move to the right to be in front of the foundation
+	  telemetry.addLine("Driving to Foundation");
 	  chassis.setTargetStrafePosition(60);
       finished = chassis.driveStrafeEnc(.4);
+	  telemetry.update();
+	  
       while (!finished) {
+		telemetry.addLine("Driving to Foundation");
         finished = chassis.driveStrafeEnc(.4);
+		telemetry.update();
       }
       
       //drive up to foundation and raise elevator
+	  telemetry.addLine("Driving to Foundation");
 	  chassis.setTargetStraightPosition(10);
       finished = chassis.driveStraightEnc(.4) && intake.setHeight(.5,5);
+	  telemetry.update();
+	  
       while (!finished) {
+		telemetry.addLine("Driving to Foundation");
         finished = chassis.driveStraightEnc(.4) && intake.setHeight(.5,5);
+		telemetry.update();
       }
       
       //shoot the stone out of the robot
+	  telemetry.addLine("Placing Stone");
       startTimeMilis = System.currentTimeMillis();
       timeElapsed = System.currentTimeMillis() - startTimeMilis;
+	  telemetry.update();
+	  
       while (timeElapsed < 1) {
         intake.intakeIn();
 		timeElapsed = System.currentTimeMillis() - startTimeMilis;
@@ -84,6 +102,7 @@ public class SkystoneAutonomousMain extends LinearOpMode {
       //back away from foundation, pulling it with you
 	  chassis.setTargetStraightPosition(-20);
       finished = chassis.driveStraightEnc(.4);
+	  
       while (!finished) {
         finished = chassis.driveStraightEnc(.4);
       }
