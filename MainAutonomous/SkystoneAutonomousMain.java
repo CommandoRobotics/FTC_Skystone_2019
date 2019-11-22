@@ -28,7 +28,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous
 
-public class ENCODERCraterRoverRuckusAutonomous extends LinearOpMode {
+public class SkystoneAutonomousMain extends LinearOpMode {
 
     //private static final int SAMPLE_TIME_ADDITION = 4000;
     //private static final int SAMPLE_START_DELAY = 1000;
@@ -52,21 +52,24 @@ public class ENCODERCraterRoverRuckusAutonomous extends LinearOpMode {
       }
       
       //move forward x inches from start postition
-      finished = chassis.driveStraight(.4,16);
+	  chassis.setTargetStraightPosition(16);
+      finished = chassis.driveStraightEnc(.4);
       while (!finished) {
-        finished = chassis.driveStraight(.4,16);
+        finished = chassis.driveStraightEnc(.4);
       }
       
       //move to the right to be in front of the foundation
-      finished = chassis.driveStrafe(.4,60);
+	  chassis.setTargetStrafePosition(60);
+      finished = chassis.driveStrafeEnc(.4);
       while (!finished) {
-        finished = .driveStrafe(.4,60);
+        finished = chassis.driveStrafeEnc(.4);
       }
       
       //drive up to foundation and raise elevator
-      finished = chassis.driveStraight(.4,10) && intake.setHeight(.5,5);
+	  chassis.setTargetStraightPosition(10);
+      finished = chassis.driveStraightEnc(.4) && intake.setHeight(.5,5);
       while (!finished) {
-        finished = chassis.driveStraight(.4,10) && intake.setHeight(.5,5);
+        finished = chassis.driveStraightEnc(.4) && intake.setHeight(.5,5);
       }
       
       //shoot the stone out of the robot
@@ -74,13 +77,15 @@ public class ENCODERCraterRoverRuckusAutonomous extends LinearOpMode {
       timeElapsed = System.currentTimeMillis() - startTimeMilis;
       while (timeElapsed < 1) {
         intake.intakeIn();
+		timeElapsed = System.currentTimeMillis() - startTimeMilis;
       }
       intake.stopIntake();
       
       //back away from foundation, pulling it with you
-      finished = chassis.driveStraight(.4,-20);
+	  chassis.setTargetStraightPosition(-20);
+      finished = chassis.driveStraightEnc(.4);
       while (!finished) {
-        finished = chassis.driveStraight(.4,-20);
+        finished = chassis.driveStraightEnc(.4);
       }
       
       //drive to postiiton to sample
