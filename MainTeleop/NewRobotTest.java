@@ -24,12 +24,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name="NewRobotTest")
+@Disabled
 
 public class NewRobotTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        
+
         FTCOmniDriveAPI robot = new FTCOmniDriveAPI(hardwareMap);
         telemetry.addLine("Robot initialized");
         telemetry.update();
