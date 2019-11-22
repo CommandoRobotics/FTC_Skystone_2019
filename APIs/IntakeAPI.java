@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.APIs;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -15,6 +14,7 @@ public class IntakeAPI{
   DcMotor leftIntakeMotor;
   DcMotor rightIntakeMotor;
   TouchSensor inTouch;
+  Telemetry telemetry;
 
   double elevatorUpPower = .5;
   double elevatorDownPower = -.5;
@@ -23,7 +23,7 @@ public class IntakeAPI{
   private final double MAXHEIGHT = 0;
   double currentHeight;
   double totalDistance;
-
+ 
   //values used for encoders
   private double DIAMETER = 2;
   private double RADIUS = DIAMETER/2;
@@ -31,12 +31,13 @@ public class IntakeAPI{
   private double circumference = RADIUS*3.14159;
   double disPerPulse = circumference/PULSESPERROTATION;
 
-  public IntakeAPI(HardwareMap hwMap) {
+  public IntakeAPI(HardwareMap hwMap, Telemetry tele) {
     this.leftElevatorMotor = hwMap.get(DcMotor.class, "leftElevator");
     this.rightElevatorMotor = hwMap.get(DcMotor.class, "rightElevator");
     this.leftIntakeMotor = hwMap.get(DcMotor.class, "leftIntake");
     this.rightIntakeMotor = hwMap.get(DcMotor.class, "rightIntake");
     this.inTouch = hwMap.get(TouchSensor.class, "intakeTouchSensor");
+    this.telemetry = tele;
 
     this.leftElevatorMotor.setDirection(DcMotor.Direction.REVERSE);
     this.leftIntakeMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -60,33 +61,33 @@ public class IntakeAPI{
   }
 
   //For later. The goal is to be able to set a height and the motors will move there using encoders. Pretty simple
-  public boolean setHeight(double power, double targetHeight, Telemetry telemetry) {
+  public boolean setHeight(double power, double targetHeight) {
     currentHeight = calculateHeight();
     totalDistance = Math.abs(targetHeight - currentHeight);
     power = Math.abs(power);
     boolean finished = false;
     if (targetHeight >= MAXHEIGHT) {
       stopElevator();
-	  finished = true;
-	  telemetry.addLine("setHeight() FAILED: Height set over max height");
+	    finished = true;
+	    telemetry.addLine("setHeight() FAILED: Height set over max height");
+    } else if (currentHeight == targetHeight || totalDistance < .5 || finished) {
+      stopElevator();
+      finished = true;
     } else if (currentHeight > targetHeight && totalDistance > .5 && !finished) {
       controlElevator(-power);
       finished = false;
     } else if (currentHeight < targetHeight && totalDistance > .5 && !finished) {
       controlElevator(power);
       finished = false;
-    } else if (currentHeight == targetHeight || totalDistance < .5 || finished) {
-      stopElevator();
-      finished = true;
     }
-
-	if (finished) {
-		telemetry.addLine("Elevator Height Complete/Reached");
-	} else {
-		telemetry.addData("Target height: ", targetHeight);
-		telemetry.addData("Current height: ", calculateHeight());
-	}
-	return finished;
+	
+	  if (finished) {
+		  telemetry.addLine("Elevator Height Complete/Reached");
+	  } else {
+		  telemetry.addData("Target height: ", targetHeight);
+		  telemetry.addData("Current height: ", calculateHeight());
+	  }
+	  return finished;
   }
 
   //Sets the Elevator all the way back to the ground using encoder values
@@ -101,21 +102,7 @@ public class IntakeAPI{
       stopElevator();
       finished = true;
     }
-    return finished;
-  }
-
-  //Same thing but with telemetry output
-  public boolean resetElevator(Telemetry telemetry) {
-    double currentHeight = calculateHeight();
-    boolean finished = false;
-    if (currentHeight > 2) {
-      elevatorDown();
-      finished = false;
-    } else if(currentHeight <= .5) {
-      stopElevator();
-      finished = true;
-    }
-
+	
 	if (finished) {
 		telemetry.addLine("Elevator Height Complete/Reached");
 	} else {
