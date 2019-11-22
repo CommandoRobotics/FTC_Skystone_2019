@@ -291,7 +291,7 @@ public class TeleopMain extends LinearOpMode {
               isAPressed = false;
             }
 
-            coordinateTest.calculateCoordinates(robotLocationX, robotLocationY, RIPSteve.getRotation(), 0.0, 0.0, 0.0);
+            coordinateTest.calculateCoordinates(robotLocationX, robotLocationY, 90, 10.0, 0.0, 0.0);
             telemetry.addData("Left Power", coordinateTest.coordinatesLeftMotorPower());
             telemetry.addData("Right Power", coordinateTest.coordinatesRightMotorPower());
             telemetry.addData("Strafe Power", coordinateTest.coordinatesStrafeMotorPower());
