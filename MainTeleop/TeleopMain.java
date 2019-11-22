@@ -27,6 +27,7 @@ import org.firstinspires.ftc.teamcode.APIs.FTCOmniDriveAPI;
 import org.firstinspires.ftc.teamcode.APIs.CoordinateSystemAPI;
 
 @TeleOp(name="TeleopMain")
+@Disabled
 
 public class TeleopMain extends LinearOpMode {
 
