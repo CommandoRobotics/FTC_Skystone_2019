@@ -1,10 +1,11 @@
 package org.firstinspires.ftc.teamcode.APIs;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Hardware;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.HardwareDevice.ColorSensor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 
 public class ColorSensorAPI {
 
@@ -43,9 +44,10 @@ public class ColorSensorAPI {
   }
 
   public boolean isSkystoneDetected() {
-    if (color.isBlack() && !color.isYellow()) {
+    if (isBlack() && !isYellow()) {
       return true;
     } else {
       return false;
+    }
   }
 }
