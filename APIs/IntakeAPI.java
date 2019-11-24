@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.APIs;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -23,7 +24,7 @@ public class IntakeAPI{
   private final double MAXHEIGHT = 0;
   double currentHeight;
   double totalDistance;
- 
+
   //values used for encoders
   private double DIAMETER = 2;
   private double RADIUS = DIAMETER/2;
@@ -53,10 +54,10 @@ public class IntakeAPI{
   //Allows you to control the Elevator by setting it to a + or - power
   public void controlElevator(double power) {
     if (calculateHeight() >= MAXHEIGHT && power > 0) {
-      stopElevator();
+      //stopElevator();
     } else {
-      this.leftElevatorMotor.setPower(power);
-      this.rightElevatorMotor.setPower(power);
+      leftElevatorMotor.setPower(power);
+      rightElevatorMotor.setPower(power);
     }
   }
 
@@ -68,8 +69,8 @@ public class IntakeAPI{
     boolean finished = false;
     if (targetHeight >= MAXHEIGHT) {
       stopElevator();
-	    finished = true;
-	    telemetry.addLine("setHeight() FAILED: Height set over max height");
+        finished = true;
+        telemetry.addLine("setHeight() FAILED: Height set over max height");
     } else if (currentHeight == targetHeight || totalDistance < .5 || finished) {
       stopElevator();
       finished = true;
@@ -80,14 +81,14 @@ public class IntakeAPI{
       controlElevator(power);
       finished = false;
     }
-	
-	  if (finished) {
-		  telemetry.addLine("setHeight() COMPLETE");
-	  } else {
-		  telemetry.addData("Target height: ", targetHeight);
-		  telemetry.addData("Current height: ", calculateHeight());
-	  }
-	  return finished;
+
+      if (finished) {
+          telemetry.addLine("setHeight() COMPLETE");
+      } else {
+          telemetry.addData("Target height: ", targetHeight);
+          telemetry.addData("Current height: ", calculateHeight());
+      }
+      return finished;
   }
 
   //Sets the Elevator all the way back to the ground using encoder values
@@ -102,13 +103,13 @@ public class IntakeAPI{
       stopElevator();
       finished = true;
     }
-	
-	if (finished) {
-		telemetry.addLine("Elevator Height Complete/Reached");
-	} else {
-		telemetry.addData("Target height: ", 0);
-		telemetry.addData("Current height: ", calculateHeight());
-	}
+
+    if (finished) {
+        telemetry.addLine("Elevator Height Complete/Reached");
+    } else {
+        telemetry.addData("Target height: ", 0);
+        telemetry.addData("Current height: ", calculateHeight());
+    }
     return finished;
   }
 
