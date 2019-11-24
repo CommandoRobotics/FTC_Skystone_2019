@@ -30,8 +30,8 @@ public class NewRobotTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
-        FTCOmniDriveAPI robot = new FTCOmniDriveAPI(hardwareMap);
+        
+        FTCOmniDriveAPI robot = new FTCOmniDriveAPI(hardwareMap, telemetry);
         telemetry.addLine("Robot initialized");
         telemetry.update();
 
@@ -39,9 +39,9 @@ public class NewRobotTest extends LinearOpMode {
 
         while (opModeIsActive()) {
             robot.driveOmniJoystick(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
-            telemetry.addData("Left Wheel Output: ", robot.leftMotorSpeed);
-            telemetry.addData("Right Wheel Output: ", robot.rightMotorSpeed);
-            telemetry.addData("Strafe Wheel Output: ", robot.strafeMotorSpeed);
+            //telemetry.addData("Left Wheel Output: ", robot.leftMotorSpeed);
+            //telemetry.addData("Right Wheel Output: ", robot.rightMotorSpeed);
+            //telemetry.addData("Strafe Wheel Output: ", robot.strafeMotorSpeed);
             telemetry.addData("Joystick 1 X Output: ", gamepad1.left_stick_x);
             telemetry.addData("Joystick 1 -Y Output: ", -gamepad1.left_stick_y);
             telemetry.addData("Joystick 2 X Output: ", gamepad1.right_stick_x);

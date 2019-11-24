@@ -15,9 +15,12 @@ public class BishopKelleyQualifier extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-
-        FTCOmniDriveAPI robot = new FTCOmniDriveAPI(hardwareMap);
+      
+        FTCOmniDriveAPI robot = new FTCOmniDriveAPI(hardwareMap, telemetry);
         IntakeAPI intake = new IntakeAPI(hardwareMap, telemetry);
+        
+        boolean aToggle = false; 
+        boolean previousA = false;
 
         gamepad1.setJoystickDeadzone(0);
 
@@ -28,20 +31,31 @@ public class BishopKelleyQualifier extends LinearOpMode {
 
         while (opModeIsActive()) {
             robot.driveOmniJoystick(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
-
-            //Elevator control logc
-            if(gamepad1.left_bumper && !gamepad1.right_bumper){
-              intake.controlElevator(-0.5);
-            } else if(gamepad1.right_bumper && !gamepad1.left_bumper){
-              intake.controlElevator(0.5);
+            if(gamepad1.left_trigger > 0 && gamepad1.right_trigger == 0){
+              intake.controlElevator(gamepad1.left_trigger);
+            } else if(gamepad1.right_trigger > 0 && gamepad1.left_trigger == 0){
+              intake.controlElevator(-gamepad1.right_trigger);
             } else {
               intake.controlElevator(0);
             }
-
-            if(gamepad1.left_trigger > 0.1 && !(gamepad1.right_trigger > 0.1)){
-              intake.controlIntake(gamepad1.left_trigger);
-            } else if(gamepad1.right_trigger > 0.1 && !(gamepad1.left_trigger > 0.1)){
-              intake.controlIntake(gamepad1.right_trigger);
+  
+            // if (gamepad1.a != previousA) {
+            //   aToggle = !aToggle;
+            // }
+            // if (aToggle) {
+            //   boolean finished = intake.setHeight(.4,5);
+            //   if (!finished) {
+            //     finished = intake.setHeight(.4,5);
+            //   } else {
+            //     intake.stopIntake();
+            //   }
+            // }
+            // previousA = gamepad1.a;
+            
+            if(gamepad1.left_bumper && !gamepad1.right_bumper){
+              intake.controlIntake(1);
+            } else if(gamepad1.right_bumper && !gamepad1.left_bumper){
+              intake.controlIntake(-1);
             } else {
               intake.controlIntake(0);
             }

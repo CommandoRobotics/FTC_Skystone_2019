@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.APIs;
 
 import java.lang.*;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Hardware;
@@ -21,26 +22,29 @@ public class FTCOmniDriveAPI{
   DcMotor leftMotor;
   DcMotor rightMotor;
   DcMotor strafeMotor;
+  Telemetry telemetry;
   
   //Color Sensors
   ColorSensorAPI leftFColor;
   ColorSensorAPI rightFColor;
-  ColorSensorAPI undersideColor;
+  public static ColorSensorAPI undersideColor;
   
   //Variables used to calulate distance per pulse
   private double DIAMETER = 2;
   private double RADIUS = DIAMETER/2;
   private double PULSESPERROTATION = 1120;
-  private double circumference = RADIUS*pi;
+  private double circumference = RADIUS*3.14159;
   double disPerPulse = circumference/PULSESPERROTATION;
   
-  public FTCOmniDriveAPI(HardwareMap hwMap) {
+  public FTCOmniDriveAPI(HardwareMap hwMap, Telemetry tele) {
     this.leftMotor = hwMap.get(DcMotor.class, "leftDrive");
     this.rightMotor = hwMap.get(DcMotor.class, "rightDrive");
     this.strafeMotor = hwMap.get(DcMotor.class, "strafeDrive");
-    this.rightFColor = new ColorSensorAPI(hwMap, "frontRightColorSensor");
-    this.leftFColor = new ColorSensorAPI(hwMap, "frontLeftColorSensor");
+    // this.rightFColor = new ColorSensorAPI(hwMap, "frontRightColorSensor");
+    // this.leftFColor = new ColorSensorAPI(hwMap, "frontLeftColorSensor");
     this.undersideColor = new ColorSensorAPI(hwMap, "undersideColorSensor");
+    this.strafeMotor.setDirection(DcMotor.Direction.REVERSE);
+    this.telemetry = tele;
   }
   
   
@@ -107,7 +111,7 @@ public class FTCOmniDriveAPI{
   }
   
   //Drives forward or backwards based on a power input infintely
-  public void driveStraight(double straightPower) {
+  public void driveStraight(float straightPower) {
     driveOmni(straightPower,0,0);
   }
   
@@ -116,24 +120,25 @@ public class FTCOmniDriveAPI{
   }
   //Drives forward or backward to a certain distance at a power
   //meant to be run continuously
-  public boolean driveStraightEnc(double straightPower) {
+  public boolean driveStraightEnc(float straightPower) {
     //Transform the encoder counts to start positions and finish positions
     double totalDistance = targetFPosition - getDistanceStraight();
-	straightPower = Math.abs(straightPower);
+    straightPower = Math.abs(straightPower);
 
     if(totalDistance >= 0) {
         if (totalDistance <= .1 && totalDistance >= -.1) {
           stopMotors();
-		  telemetry.addLine("driveSraightEnc() COMPLETE");
+          telemetry.addLine("driveSraightEnc() COMPLETE");
           return true;
         } else {
           driveOmni(straightPower,0,0);
           telemetry.addData("Distance Left to Drive: ", totalDistance);
           return false;
+        }
     } else {
         if (totalDistance <= .1 && totalDistance >= -.1) {
           stopMotors();
-		  telemetry.addLine("driveSraightEnc() COMPLETE");
+          telemetry.addLine("driveSraightEnc() COMPLETE");
           return true;
         } else {
           driveOmni(-straightPower,0,0);
@@ -143,10 +148,8 @@ public class FTCOmniDriveAPI{
     }
   }
   
-  public void driveStraightPI(
-  
   //strafes forward or backwards based on a power input infintely
-  public void driveStrafe(double strafePower) {
+  public void driveStrafe(float strafePower) {
     driveOmni(0,strafePower,0);
   }
   
@@ -155,24 +158,25 @@ public class FTCOmniDriveAPI{
   }
   //Drives forward or backward to a certain distance at a power
   //meant to be run continuously
-  public boolean driveStrafeEnc(double strafePower) {
+  public boolean driveStrafeEnc(float strafePower) {
     //Transform the encoder counts to start positions and finish positions
     double totalDistance = targetSPosition - getDistanceStrafe();
-	strafePower = Math.abs(strafePower);
+    strafePower = Math.abs(strafePower);
     
     if(totalDistance >= 0) {
         if (totalDistance <= .1 && totalDistance >= -.1) {
           stopMotors();
-		  telemetry.addLine("driveSrafeEnc() COMPLETE");
+          telemetry.addLine("driveSrafeEnc() COMPLETE");
           return true;
         } else {
           driveOmni(strafePower,0,0);
           telemetry.addData("Distance Left to Strafe: ", totalDistance);
           return false;
+        }
     } else {
         if (totalDistance <= .1 && totalDistance >= -.1) {
           stopMotors();
-		  telemetry.addLine("driveSrafeEnc() COMPLETE");
+          telemetry.addLine("driveSrafeEnc() COMPLETE");
           return true;
         } else {
           driveOmni(-strafePower,0,0);
@@ -183,12 +187,12 @@ public class FTCOmniDriveAPI{
   }
   
   //Rotates forward or backwards based on a power input infintely
-  public void driveRotate(double rotatePower) {
+  public void driveRotate(float rotatePower) {
     driveOmni(0,0,rotatePower);
   }
 
   //Rotates forward or backward to a angle at a power
-  public void driveRotate(double rotatePower, double angle) {
+  public void driveRotate(float rotatePower, double angle) {
     driveOmni(0,0,rotatePower);
   }
   
@@ -206,7 +210,7 @@ public class FTCOmniDriveAPI{
     return this.disPerPulse;
   }
   
-  public double getDistanceStriaght() {
+  public double getDistanceStraight() {
     return ((getDistance(this.leftMotor) + -getDistance(this.rightMotor))/2);
   }
   

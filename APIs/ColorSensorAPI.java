@@ -15,17 +15,17 @@ public class ColorSensorAPI {
     color = hwMap.get(ColorSensor.class, sensorName);
   }
 
-	public getRed() {
-		return color.red();
-	}
-	
-	public getGreen() {
-		return color.green();
-	}
-	
-	public getBlue() {
-		return color.blue();
-	}
+    public double getRed() {
+        return color.red();
+    }
+    
+    public double getGreen() {
+        return color.green();
+    }
+    
+    public double getBlue() {
+        return color.blue();
+    }
 
   public boolean isBlack() {
     if (color.red() < 10 && color.blue() < 10 && color.green() < 10) {
