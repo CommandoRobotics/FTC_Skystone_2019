@@ -26,9 +26,10 @@ import static org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocaliz
 import org.firstinspires.ftc.teamcode.APIs.FTCOmniDriveAPI;
 import org.firstinspires.ftc.teamcode.APIs.CoordinateSystemAPI;
 
-@TeleOp(name="BishopKelleyQualifier")
+@TeleOp(name="VuforiaTeleop")
+@Disabled
 
-public class BishopKelleyQualifier extends LinearOpMode {
+public class VuforiaTeleop extends LinearOpMode {
 
   private static final VuforiaLocalizer.CameraDirection CAMERA_CHOICE = BACK;
   private static final boolean PHONE_IS_PORTRAIT = true  ;
@@ -207,12 +208,12 @@ public class BishopKelleyQualifier extends LinearOpMode {
                     .multiplied(Orientation.getRotationMatrix(EXTRINSIC, YZX, DEGREES, phoneYRotate, phoneZRotate, phoneXRotate));
 
             /**  Let all the trackable listeners know where the phone is.  */
-        for (VuforiaTrackable trackable : allTrackables) {
-            ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
-        }
+        // for (VuforiaTrackable trackable : allTrackables) {
+        //     ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
+        // }
 
-        FTCOmniDriveAPI robot = new FTCOmniDriveAPI(hardwareMap);
-        CoordinateSystemAPI coordinateSystem = new CoordinateSystemAPI(0.2);
+        FTCOmniDriveAPI RIPSteve = new FTCOmniDriveAPI(hardwareMap);
+        CoordinateSystemAPI coordinateTest = new CoordinateSystemAPI(0.2);
 
         gamepad1.setJoystickDeadzone(0);
 
@@ -229,10 +230,10 @@ public class BishopKelleyQualifier extends LinearOpMode {
 
 
         while (opModeIsActive()) {
-            robot.driveOmniJoystick(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
-            // telemetry.addData("Strafe Wheel inch", robot.getDistanceStrafe());
-            // telemetry.addData("ave forward inch", robot.getDistanceStraight());
-            // telemetry.addData("totalDistance", robot.getDisPerPulse() * 1120);
+            RIPSteve.driveOmniJoystick(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+            // telemetry.addData("Strafe Wheel inch", RIPSteve.getDistanceStrafe());
+            // telemetry.addData("ave forward inch", RIPSteve.getDistanceStraight());
+            // telemetry.addData("totalDistance", RIPSteve.getDisPerPulse() * 1120);
             // telemetry.update();
 
 
@@ -275,7 +276,31 @@ public class BishopKelleyQualifier extends LinearOpMode {
                 telemetry.addData("Visible Target", "none");
             }
 
-            telemetry.addData("Robot rotation", robot.getRotation());
+            boolean isAPressed = false;
+            boolean activateAutoPilot = false;
+
+            if(gamepad1.a){
+              if(isAPressed == false){
+                isAPressed = true;
+                if(activateAutoPilot){
+                  activateAutoPilot = false;
+                } else {
+                  activateAutoPilot = true;
+                }
+              }
+            } else {
+              isAPressed = false;
+            }
+
+            coordinateTest.calculateCoordinates(robotLocationX, robotLocationY, RIPSteve.getRotation(), 0.0, 0.0, 0.0);
+            telemetry.addData("Left Power", coordinateTest.coordinatesLeftMotorPower());
+            telemetry.addData("Right Power", coordinateTest.coordinatesRightMotorPower());
+            telemetry.addData("Strafe Power", coordinateTest.coordinatesStrafeMotorPower());
+            if(activateAutoPilot){
+              telemetry.addLine("Auto Pilot Activated");
+              RIPSteve.controlChassis(-coordinateTest.coordinatesLeftMotorPower(), coordinateTest.coordinatesRightMotorPower(), coordinateTest.coordinatesStrafeMotorPower());
+            }
+            telemetry.addData("Robot rotation", RIPSteve.getRotation());
             telemetry.update();
         }
 
