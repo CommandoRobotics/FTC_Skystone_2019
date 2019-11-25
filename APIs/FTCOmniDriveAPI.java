@@ -6,8 +6,12 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Hardware;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.teamcode.APIs.GyroscopeAPI;
 
 public class FTCOmniDriveAPI{
+
+  //Create gyroscope Object
+  GyroscopeAPI gyro;
 
   //Outputs to wheel
   double leftMotorSpeed;
@@ -45,6 +49,7 @@ public class FTCOmniDriveAPI{
     this.undersideColor = new ColorSensorAPI(hwMap, "undersideColorSensor");
     this.strafeMotor.setDirection(DcMotor.Direction.REVERSE);
     this.telemetry = tele;
+    gyro = new GyroscopeAPI(hwMap);
   }
 
 
@@ -274,4 +279,29 @@ public class FTCOmniDriveAPI{
   public double getStrafeMotorSpeed(){
     return this.strafeMotorSpeed;
   }
-} 
+
+  public double getRawRotation(){
+    gyro.update();
+    return -gyro.getZ();
+  }
+
+  public double getRotation(){
+    gyro.update();
+    double rawAngle = -gyro.getZ();
+    double reducedAngle;
+    double modifiedAngle;
+    if(Math.abs(rawAngle) > 360){
+      reducedAngle = rawAngle%360;
+    } else {
+      reducedAngle = rawAngle;
+    }
+
+    if(reducedAngle < 0){
+      modifiedAngle = 360-reducedAngle;
+    } else {
+      modifiedAngle = reducedAngle;
+    }
+    return modifiedAngle;
+  }
+
+}
