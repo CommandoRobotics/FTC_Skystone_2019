@@ -25,6 +25,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.teamcode.APIs.*;
 
 @Autonomous
 
@@ -35,84 +36,13 @@ public class SkystoneAutonomousMain extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-      //initialize objects
-      FTCOmniDriveAPI chassis = new FTCOmniDriveAPI(hardwareMap);
-      IntakeAPI intake = new IntakeAPI(hardwareMap, telemetry);
-      
-      boolean finished = false;
-      double startTimeMilis;
-      double timeElapsed;
-      
-      
-      
-      //wait till autonomous is enabled
-      while (!opModeIsActive()) {
-        telemetry.addLine("Initialized. Waiting for Start");
-        telemetry.update();
-      }
-      
-      //move forward x inches from start postition
-	  telemetry.addLine("Driving to Foundation");
-	  chassis.setTargetStraightPosition(16);
-      finished = chassis.driveStraightEnc(.4);
-	  telemetry.update();
-	  
-      while (!finished) {
-		telemetry.addLine("Driving to Foundation");
-        finished = chassis.driveStraightEnc(.4);
-		telemetry.update();
-      }
-      
-      //move to the right to be in front of the foundation
-	  telemetry.addLine("Driving to Foundation");
-	  chassis.setTargetStrafePosition(60);
-      finished = chassis.driveStrafeEnc(.4);
-	  telemetry.update();
-	  
-      while (!finished) {
-		telemetry.addLine("Driving to Foundation");
-        finished = chassis.driveStrafeEnc(.4);
-		telemetry.update();
-      }
-      
-      //drive up to foundation and raise elevator
-	  telemetry.addLine("Driving to Foundation");
-	  chassis.setTargetStraightPosition(10);
-      finished = chassis.driveStraightEnc(.4) && intake.setHeight(.5,5);
-	  telemetry.update();
-	  
-      while (!finished) {
-		telemetry.addLine("Driving to Foundation");
-        finished = chassis.driveStraightEnc(.4) && intake.setHeight(.5,5);
-		telemetry.update();
-      }
-      
-      //shoot the stone out of the robot
-	  telemetry.addLine("Placing Stone");
-      startTimeMilis = System.currentTimeMillis();
-      timeElapsed = System.currentTimeMillis() - startTimeMilis;
-	  telemetry.update();
-	  
-      while (timeElapsed < 1) {
-        intake.intakeIn();
-		timeElapsed = System.currentTimeMillis() - startTimeMilis;
-      }
-      intake.stopIntake();
-      
-      //back away from foundation, pulling it with you
-	  chassis.setTargetStraightPosition(-20);
-      finished = chassis.driveStraightEnc(.4);
-	  
-      while (!finished) {
-        finished = chassis.driveStraightEnc(.4);
-      }
-      
-      //drive to postiiton to sample
-      finished = chassis.driveStraight(.4,30) && chassis.driveStrafe(.4,-50);
-      while (!finished) {
-        finished =
-      }
-      
-      
-      
+
+      FTCOmniDriveAPI chassis = new FTCOmniDriveAPI(hardwareMap, telemetry);
+      chassis.resetEncoders();
+      waitForStart();
+
+      chassis.driveStraightEnc(24,0.5f);
+      chassis.driveStrafeEnc(24,.4f);
+
     }
+}
