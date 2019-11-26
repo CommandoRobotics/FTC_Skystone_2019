@@ -55,6 +55,9 @@ public class FTCOmniDriveAPI{
 
   //Creates the OmniDrive mathematical outputs for all motors based on an two x inputs and a y input or 3 values: Forward, Strafe, and Rotation
   public void calculateWheelSpeeds(float joystick1x, float joystick1y, float joystick2x) {
+
+    double MINIMUM_WHEEL_SPEED = .2;
+
     //create 3D inputs based on joystick coordinates
     double forwardInput = (double) joystick1y;
     double strafeInput = (double) joystick1x;
@@ -87,10 +90,33 @@ public class FTCOmniDriveAPI{
       }
     }
 
-    leftMotorSpeed = targetLeftMotorSpeed;
-    rightMotorSpeed = targetRightMotorSpeed;
+    double forwardRotationDifference;
+    if(forwardInput > rotationInput){
+      forwardRotationDifference = forwardInput-rotationInput;
+    } else if(forwardInput < rotationInput){
+      forwardRotationDifference = rotationInput-forwardInput;
+    } else {
+      forwardRotationDifference = 0;
+    }
+    if(forwardRotationDifference <= MINIMUM_WHEEL_SPEED){
+      if(forwardInput < 0){
+        if(rotationInput < 0){
+          targetRightMotorSpeed = MINIMUM_WHEEL_SPEED;
+        } else if(rotationInput > 0){
+          targetLeftMotorSpeed = MINIMUM_WHEEL_SPEED;
+        }
+      } else if(forwardInput > 0){
+        if(rotationInput < 0){
+          targetLeftMotorSpeed = MINIMUM_WHEEL_SPEED;
+        } else if(rotationInput > 0){
+          targetRightMotorSpeed = MINIMUM_WHEEL_SPEED;
+        }
+      }
+    } else {
+      leftMotorSpeed = targetLeftMotorSpeed;
+      rightMotorSpeed = targetRightMotorSpeed;
+    }
     strafeMotorSpeed = targetStrafeMotorSpeed;
-
   }
 
   //Cnotrol the chassis as an omni drive using joystick inputs
