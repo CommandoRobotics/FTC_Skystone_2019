@@ -173,6 +173,8 @@ public class IntakeAPI{
   public void resetElevatorEncoders() {
     this.leftElevatorMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     this.rightElevatorMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    this.leftElevatorMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    this.rightElevatorMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
   }
 
   //Calculate distance traveled by a motor using a motor's current pulses * disPerPulse
