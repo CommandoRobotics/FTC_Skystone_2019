@@ -6,12 +6,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Hardware;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.teamcode.APIs.GyroscopeAPI;
+import org.firstinspires.ftc.teamcode.APIs.*;
 
 public class FTCOmniDriveAPI{
-
-  //Create gyroscope Object
-  GyroscopeAPI gyro;
 
   //Outputs to wheel
   double leftMotorSpeed;
@@ -23,10 +20,18 @@ public class FTCOmniDriveAPI{
   double targetSPosition;
 
   //Motors
-  public DcMotor leftMotor;
-  public DcMotor rightMotor;
+  DcMotor leftMotor;
+  DcMotor rightMotor;
   DcMotor strafeMotor;
   Telemetry telemetry;
+  GyroscopeAPI gyro;
+  PidAPI leftStraightPID;
+  PidAPI rightStraightPID;
+  PidAPI strafeStraightPID;
+  PidAPI leftRotatePID;
+  PidAPI rightRotatePID;
+  PidAPI strafeRotatePID;
+
 
   //Color Sensors
   ColorSensorAPI leftFColor;
@@ -44,12 +49,19 @@ public class FTCOmniDriveAPI{
     this.leftMotor = hwMap.get(DcMotor.class, "leftDrive");
     this.rightMotor = hwMap.get(DcMotor.class, "rightDrive");
     this.strafeMotor = hwMap.get(DcMotor.class, "strafeDrive");
+    this.gyro = new GyroscopeAPI(hwMap);
+    //this.leftStraightPID = new PidAPI();
+    //this.rightStraightPID = new PidAPI();
+    //this.strafeStraightPID = new PidAPI();
+    this.leftRotatePID = new PidAPI(PidAPI.PID_MODE, 0.5, 0.02, 0.0006, 0.01, 1e9);
+    this.rightRotatePID = new PidAPI(PidAPI.PID_MODE, 0.5, 0.02, 0.0006, 0.01, 1e9);
+    leftRotatePID.makeAllGainsNegative();
+    //this.strafeRotatePID = new PidAPI();
     // this.rightFColor = new ColorSensorAPI(hwMap, "frontRightColorSensor");
     // this.leftFColor = new ColorSensorAPI(hwMap, "frontLeftColorSensor");
     this.undersideColor = new ColorSensorAPI(hwMap, "undersideColorSensor");
     this.strafeMotor.setDirection(DcMotor.Direction.REVERSE);
     this.telemetry = tele;
-    gyro = new GyroscopeAPI(hwMap);
   }
 
 
@@ -122,7 +134,7 @@ public class FTCOmniDriveAPI{
 
 
 
-
+  //DRIVE WITH JUST ENCODERS
 
 
 
@@ -224,6 +236,39 @@ public class FTCOmniDriveAPI{
 
 
 
+  //DRIVE WITH PID AND ENCODERS
+
+
+
+  //Need to correct rotation, setPoint, and drift to left/right
+  public void driveStraightPID(double bias, double targetDistance) {
+
+    leftStraightPID.setBias(-bias);
+    rightStraightPID.setBias(bias);
+    //leftRotatePID.setBias(leftStraightPID.getOutput());
+  }
+
+  public void pidTest(double bias, double targetValue, double startTime) {
+        telemetry.addData("Left PID", 0);
+    telemetry.update();
+    while(true) {
+    double dt = System.nanoTime() - startTime;
+
+
+    leftRotatePID.setBias(bias);
+    rightRotatePID.setBias(bias);
+    gyro.update();
+
+    leftMotor.setPower(-leftRotatePID.getOutput(-gyro.getZ(), targetValue, dt));
+    rightMotor.setPower(rightRotatePID.getOutput(-gyro.getZ(), targetValue, dt));
+    telemetry.addData("Right PID", rightRotatePID.getOutput(gyro.getZ(), targetValue, dt));
+    telemetry.addData("Left PID", leftRotatePID.getOutput(gyro.getZ(), targetValue, dt));
+    telemetry.addData("Rotation: ", -gyro.getZ());
+    telemetry.update();
+    }
+  }
+
+
 
 
   //Rotates forward or backwards based on a power input infintely
@@ -303,5 +348,4 @@ public class FTCOmniDriveAPI{
     }
     return modifiedAngle;
   }
-
 }
