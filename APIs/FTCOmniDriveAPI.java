@@ -129,7 +129,7 @@ public class FTCOmniDriveAPI{
 
   //Drives forward or backwards based on a power input infintely
   public void driveStraight(float straightPower) {
-    driveOmni(straightPower,0,0);
+    driveOmni(0,straightPower,0);
   }
 
 
@@ -237,15 +237,63 @@ public class FTCOmniDriveAPI{
 
 
   //DRIVE WITH PID AND ENCODERS
+  
+  
 
-
+  public void driveStraightPID(double distance, double bias) {
+    
+    setTargetStraightPosition(distance);
+    telemetry.addLine("Starting to Drive Straight");
+    
+    double startTime = System.nanoTime();
+    double dt = System.nanoTime() - startTime;
+    gyro.update();
+    double targetValue = -gyro.getZ();
+    
+    while(!straightWithPID(bias,dt,targetValue)) {
+      dt = System.nanoTime() - startTime;
+      straightWithPID(bias, dt,targetValue);
+      telemetry.update();
+    }
+    stopMotors();
+  }
 
   //Need to correct rotation, setPoint, and drift to left/right
-  public void driveStraightPID(double bias, double targetDistance) {
+  public boolean straightWithPID(double bias, double dt, double targetValue) {
 
-    leftStraightPID.setBias(-bias);
-    rightStraightPID.setBias(bias);
-    //leftRotatePID.setBias(leftStraightPID.getOutput());
+    leftRotatePID.setBias(bias);
+    rightRotatePID.setBias(bias);
+    gyro.update();
+    
+    //Transform the encoder counts to start positions and finish positions
+    double totalDistance = targetFPosition - getDistanceStraight();
+    //straightPower = Math.abs(straightPower);
+    boolean finished = false;
+
+    if(totalDistance >= 0) {
+        if (totalDistance <= .1 && totalDistance >= -.1) {
+          stopMotors();
+          telemetry.addLine("driveSraightPID() COMPLETE");
+          finished = true;
+        } else {
+          leftMotor.setPower(-leftRotatePID.getOutput(-gyro.getZ(), targetValue, dt));
+          rightMotor.setPower(rightRotatePID.getOutput(-gyro.getZ(), targetValue, dt));
+          telemetry.addData("Distance Left to Drive: ", totalDistance);
+          finished = false;
+        }
+    } else {
+        if (totalDistance <= .1 && totalDistance >= -.1) {
+          stopMotors();
+          telemetry.addLine("driveSraightPID() COMPLETE");
+          finished = true;
+        } else {
+          leftMotor.setPower(leftRotatePID.getOutput(-gyro.getZ(), targetValue, dt));
+          rightMotor.setPower(-rightRotatePID.getOutput(-gyro.getZ(), targetValue, dt));
+          telemetry.addData("Distance Left to Drive: ", totalDistance);
+          finished = false;
+        }
+    }
+    return finished;
   }
 
   public void pidTest(double bias, double targetValue, double startTime) {

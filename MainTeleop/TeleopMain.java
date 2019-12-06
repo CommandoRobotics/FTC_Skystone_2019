@@ -25,7 +25,7 @@ public class TeleopMain extends LinearOpMode {
         boolean slowModeActive = false;
 
         gamepad1.setJoystickDeadzone(0);
-
+        
         capstonePlacer.setPosition(0);
 
         telemetry.addLine("Robot Status : Initialized");
@@ -34,10 +34,10 @@ public class TeleopMain extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-
+            
             telemetry.addData("", slowModeActive);
             telemetry.update();
-
+            
             if(gamepad1.a && gamepad1.a != previousA){
               slowModeActive = !slowModeActive;
             }
@@ -78,13 +78,13 @@ public class TeleopMain extends LinearOpMode {
                 intake.controlIntake(0);
               }
             }
-
+            
             if(gamepad1.b && gamepad1.dpad_left){
               capstonePlacer.setPosition(90);
             } else {
               capstonePlacer.setPosition(0);
             }
-
+            
         }
     }
 }
