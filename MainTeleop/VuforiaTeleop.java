@@ -212,7 +212,7 @@ public class VuforiaTeleop extends LinearOpMode {
         //     ((VuforiaTrackableDefaultListener) trackable.getListener()).setPhoneInformation(robotFromCamera, parameters.cameraDirection);
         // }
 
-        FTCOmniDriveAPI RIPSteve = new FTCOmniDriveAPI(hardwareMap);
+        FTCOmniDriveAPI RIPSteve = new FTCOmniDriveAPI(hardwareMap, telemetry);
         CoordinateSystemAPI coordinateTest = new CoordinateSystemAPI(0.2);
 
         gamepad1.setJoystickDeadzone(0);
@@ -292,7 +292,7 @@ public class VuforiaTeleop extends LinearOpMode {
               isAPressed = false;
             }
 
-            coordinateTest.calculateCoordinates(robotLocationX, robotLocationY, RIPSteve.getRotation(), 0.0, 0.0, 0.0);
+            //coordinateTest.calculateCoordinates(robotLocationX, robotLocationY, RIPSteve.getRotation(), 0.0, 0.0, 0.0);
             telemetry.addData("Left Power", coordinateTest.coordinatesLeftMotorPower());
             telemetry.addData("Right Power", coordinateTest.coordinatesRightMotorPower());
             telemetry.addData("Strafe Power", coordinateTest.coordinatesStrafeMotorPower());
@@ -300,7 +300,7 @@ public class VuforiaTeleop extends LinearOpMode {
               telemetry.addLine("Auto Pilot Activated");
               RIPSteve.controlChassis(-coordinateTest.coordinatesLeftMotorPower(), coordinateTest.coordinatesRightMotorPower(), coordinateTest.coordinatesStrafeMotorPower());
             }
-            telemetry.addData("Robot rotation", RIPSteve.getRotation());
+            //telemetry.addData("Robot rotation", RIPSteve.getRotation());
             telemetry.update();
         }
 
