@@ -59,7 +59,7 @@ public class FTCOmniDriveAPI{
     //this.strafeRotatePID = new PidAPI();
     // this.rightFColor = new ColorSensorAPI(hwMap, "frontRightColorSensor");
     // this.leftFColor = new ColorSensorAPI(hwMap, "frontLeftColorSensor");
-    this.undersideColor = new ColorSensorAPI(hwMap, "undersideColorSensor");
+    this.undersideColor = new ColorSensorAPI(hwMap, "undersideColor");
     this.strafeMotor.setDirection(DcMotor.Direction.REVERSE);
     this.telemetry = tele;
   }
@@ -237,19 +237,19 @@ public class FTCOmniDriveAPI{
 
 
   //DRIVE WITH PID AND ENCODERS
-  
-  
+
+
 
   public void driveStraightPID(double distance, double bias) {
-    
+
     setTargetStraightPosition(distance);
     telemetry.addLine("Starting to Drive Straight");
-    
+
     double startTime = System.nanoTime();
     double dt = System.nanoTime() - startTime;
     gyro.update();
     double targetValue = -gyro.getZ();
-    
+
     while(!straightWithPID(bias,dt,targetValue)) {
       dt = System.nanoTime() - startTime;
       straightWithPID(bias, dt,targetValue);
@@ -264,7 +264,7 @@ public class FTCOmniDriveAPI{
     leftRotatePID.setBias(bias);
     rightRotatePID.setBias(bias);
     gyro.update();
-    
+
     //Transform the encoder counts to start positions and finish positions
     double totalDistance = targetFPosition - getDistanceStraight();
     //straightPower = Math.abs(straightPower);
