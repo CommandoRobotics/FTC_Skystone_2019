@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.firstinspires.ftc.teamcode.APIs.FTCOmniDriveAPI;
 import org.firstinspires.ftc.teamcode.APIs.IntakeAPI;
+import org.firstinspires.ftc.teamcode.APIs.CapstonePlacerAPI;
 
 @TeleOp(name="TeleopMain")
 
@@ -19,14 +20,14 @@ public class TeleopMain extends LinearOpMode {
 
         FTCOmniDriveAPI robot = new FTCOmniDriveAPI(hardwareMap, telemetry);
         IntakeAPI intake = new IntakeAPI(hardwareMap, telemetry);
-        Servo capstonePlacer = hardwareMap.get(Servo.class, "capstonePlacer");
+        CapstonePlacerAPI capstonePlacer = new CapstonePlacerAPI(hardwareMap);
 
         boolean previousA = false;
         boolean slowModeActive = false;
 
         gamepad1.setJoystickDeadzone(0);
-        
-        capstonePlacer.setPosition(0);
+
+        capstonePlacer.initialize();
 
         telemetry.addLine("Robot Status : Initialized");
         telemetry.update();
@@ -34,10 +35,10 @@ public class TeleopMain extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            
+
             telemetry.addData("", slowModeActive);
             telemetry.update();
-            
+
             if(gamepad1.a && gamepad1.a != previousA){
               slowModeActive = !slowModeActive;
             }
@@ -78,13 +79,11 @@ public class TeleopMain extends LinearOpMode {
                 intake.controlIntake(0);
               }
             }
-            
+
             if(gamepad1.b && gamepad1.dpad_left){
-              capstonePlacer.setPosition(90);
-            } else {
-              capstonePlacer.setPosition(0);
+              capstonePlacer.place();
             }
-            
+
         }
     }
 }
