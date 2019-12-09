@@ -14,10 +14,14 @@ public class CapstonePlacerAPI {
     capstonePlacer = hardwareMap.get(Servo.class, "capstonePlacer");
   }
 
+  public void initialize(){
+    capstonePlacer.setPosition(0);
+  }
+
   public void place(){
     capstonePlacer.setPosition(90);
     long startTime = System.currentTimeMillis();
-    while(System.currentTimeMillis()-startTime < 1000){
+    while(System.currentTimeMillis()-startTime < 500){
 
     }
     capstonePlacer.setPosition(0);
