@@ -14,34 +14,34 @@ public class NavigateWithStrafe extends LinearOpMode {
     FTCOmniDriveAPI chassis;
     @Override
     public void runOpMode() {
-
-
+        
+        
 
 
         intake = new IntakeAPI(hardwareMap, telemetry);
         chassis = new FTCOmniDriveAPI(hardwareMap, telemetry);
         boolean finished = false;
         double startTime;
-
+        
         waitForStart();
-
+         
          startTime =  System.currentTimeMillis();
          while (((System.currentTimeMillis()) - startTime) < 1500) {
              chassis.driveOmni(.75f,0,0);
          }
-
+         
          startTime =  System.currentTimeMillis();
          while (((System.currentTimeMillis()) - startTime) < 1000) {
              chassis.driveOmni(0,0,.3f);
          }
+         
 
-
-
-
+        
+        
         // while (opModeIsActive()) {
         //     telemetry.addData("Blue: ", FTCOmniDriveAPI.undersideColor.getBlue());
         //     telemetry.update();
-
+            
         //     while(!(FTCOmniDriveAPI.undersideColor.getBlue() > 205 && FTCOmniDriveAPI.undersideColor.getBlue() < 225) && !finished) {
         //         telemetry.addData("Blue: ", FTCOmniDriveAPI.undersideColor.getBlue());
         //         telemetry.update();
