@@ -24,7 +24,7 @@ public class IntakeAPI{
   private final double MAXHEIGHT = 0;
   double currentHeight;
   double totalDistance;
-
+ 
   //values used for encoders
   private double DIAMETER = 2;
   private double RADIUS = DIAMETER/2;
@@ -81,7 +81,7 @@ public class IntakeAPI{
       controlElevator(power);
       finished = false;
     }
-
+    
       if (finished) {
           telemetry.addLine("setHeight() COMPLETE");
       } else {
@@ -103,7 +103,7 @@ public class IntakeAPI{
       stopElevator();
       finished = true;
     }
-
+    
     if (finished) {
         telemetry.addLine("Elevator Height Complete/Reached");
     } else {
@@ -173,6 +173,8 @@ public class IntakeAPI{
   public void resetElevatorEncoders() {
     this.leftElevatorMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     this.rightElevatorMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+    this.leftElevatorMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    this.rightElevatorMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
   }
 
   //Calculate distance traveled by a motor using a motor's current pulses * disPerPulse

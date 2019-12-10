@@ -41,6 +41,26 @@ public class CoordinateSystemAPI {
         rightMotorPower = yAxisMultipliedInput;
         strafeMotorPower = -xAxisMultipliedInput;
 
+        // double radiusOfCircle = Math.sqrt(Math.pow(xAxisMultipliedInput, 2)+Math.pow(yAxisMultipliedInput, 2));
+
+        // double xAxisControllerInput = Math.toDegrees(radiusOfCircle*Math.cos(Math.toRadians(currentHeading+90)));
+        // double yAxisControllerInput = Math.toDegrees(radiusOfCircle*Math.sin(Math.toRadians(currentHeading+90)));
+
+        // leftMotorPower = yAxisControllerInput;
+        // rightMotorPower = yAxisControllerInput;
+        // strafeMotorPower = xAxisControllerInput;
+
+        // if(Math.abs(leftMotorPower) < minimumWheelSpeed){
+        //     leftMotorPower = 0;
+        // }
+
+        // if(Math.abs(rightMotorPower) < minimumWheelSpeed){
+        //     rightMotorPower = 0;
+        // }
+
+        // if(Math.abs(strafeMotorPower) < minimumWheelSpeed){
+        //     strafeMotorPower = 0;
+        // }
     }
 
     public double coordinatesLeftMotorPower(){
@@ -55,4 +75,4 @@ public class CoordinateSystemAPI {
         return strafeMotorPower;
     }
 
-}
+} 
