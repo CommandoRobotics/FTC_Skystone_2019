@@ -75,59 +75,46 @@ public class FTCOmniDriveAPI{
     double strafeInput = (double) joystick1x;
     double rotationInput = -(double) joystick2x;
 
-    double targetLeftMotorSpeed;
-    double targetRightMotorSpeed;
-    double targetStrafeMotorSpeed;
-    double goldenRatio;
+    //Find the inverse tangent of the forward/strafe values
+    double tangentOfJoystickInputs = Math.toDegrees(Math.abs(Math.atan(forwardInput/rotationInput)));
 
-    targetLeftMotorSpeed = rotationInput+forwardInput;
-    targetRightMotorSpeed = -rotationInput+forwardInput;
-    targetStrafeMotorSpeed = strafeInput;
+    double targetForwardPower = 0.01*tangentOfJoystickInputs;
+    if(targetForwardPower > 0.9){
+      targetForwardPower = 0.9+(targetForwardPower%0.1)*2;
+    }
+    double targetRotationPower = 1-targetForwardPower;
 
-    if(Math.abs(targetLeftMotorSpeed) > 1) {
-      goldenRatio = targetLeftMotorSpeed/targetRightMotorSpeed;
-      targetRightMotorSpeed = targetRightMotorSpeed/goldenRatio;
-      if(targetLeftMotorSpeed > 1) {
-        targetLeftMotorSpeed = 1;
-      } else if(targetLeftMotorSpeed < -1) {
-        targetLeftMotorSpeed = -1;
-      }
-    } else if(Math.abs(targetRightMotorSpeed) > 1) {
-      goldenRatio = targetRightMotorSpeed/targetLeftMotorSpeed;
-      targetLeftMotorSpeed = targetLeftMotorSpeed/goldenRatio;
-      if(targetRightMotorSpeed > 1){
-        targetRightMotorSpeed = 1;
-      } else if(targetRightMotorSpeed < -1){
-        targetRightMotorSpeed = -1;
-      }
+    //Determine if forward and rotation inputs are true/false
+    boolean isForwardInputNegative = false;
+    if(forwardInput < 0){
+      isForwardInputNegative = true;
+    }
+    boolean isRotationInputNegative = false;
+    if(rotationInput < 0){
+      isRotationInputNegative = true;
     }
 
-    double forwardRotationDifference;
-    if(forwardInput > rotationInput){
-      forwardRotationDifference = forwardInput-rotationInput;
-    } else if(forwardInput < rotationInput){
-      forwardRotationDifference = rotationInput-forwardInput;
-    } else {
-      forwardRotationDifference = 0;
+    double targetLeftMotorSpeed = 0;
+    double targetRightMotorSpeed = 0;
+    double targetStrafeMotorSpeed = 0;
+
+    //Set the correct motors for the direction inputted
+    if(isForwardInputNegative && isRotationInputNegative){
+      targetLeftMotorSpeed = -targetRotationPower;
+      targetRightMotorSpeed = -targetForwardPower;
+    } else if(isForwardInputNegative && !isRotationInputNegative){
+      targetLeftMotorSpeed = -targetForwardPower;
+      targetRightMotorSpeed = -targetRotationPower;
+    } else if(!isForwardInputNegative && isRotationInputNegative){
+      targetLeftMotorSpeed = targetRotationPower;
+      targetRightMotorSpeed = targetForwardPower;
+    } else if(!isForwardInputNegative && !isRotationInputNegative){
+      targetRightMotorSpeed = targetRotationPower;
+      targetLeftMotorSpeed = targetForwardPower;
     }
-    if(forwardRotationDifference <= MINIMUM_WHEEL_SPEED){
-      if(forwardInput < 0){
-        if(rotationInput < 0){
-          targetRightMotorSpeed = MINIMUM_WHEEL_SPEED;
-        } else if(rotationInput > 0){
-          targetLeftMotorSpeed = MINIMUM_WHEEL_SPEED;
-        }
-      } else if(forwardInput > 0){
-        if(rotationInput < 0){
-          targetLeftMotorSpeed = MINIMUM_WHEEL_SPEED;
-        } else if(rotationInput > 0){
-          targetRightMotorSpeed = MINIMUM_WHEEL_SPEED;
-        }
-      }
-    } else {
-      leftMotorSpeed = targetLeftMotorSpeed;
-      rightMotorSpeed = targetRightMotorSpeed;
-    }
+
+    leftMotorSpeed = targetLeftMotorSpeed;
+    rightMotorSpeed = targetRightMotorSpeed;
     strafeMotorSpeed = targetStrafeMotorSpeed;
   }
 
