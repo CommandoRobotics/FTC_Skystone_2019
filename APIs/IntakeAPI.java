@@ -29,7 +29,7 @@ public class IntakeAPI{
   private double DIAMETER = 2;
   private double RADIUS = DIAMETER/2;
   private double PULSESPERROTATION = 1120;
-  private double circumference = RADIUS*3.14159;
+  private double circumference = 2*RADIUS*3.14159;
   double disPerPulse = circumference/PULSESPERROTATION;
 
   public IntakeAPI(HardwareMap hwMap, Telemetry tele) {
@@ -54,7 +54,7 @@ public class IntakeAPI{
   //Allows you to control the Elevator by setting it to a + or - power
   public void controlElevator(double power) {
     if (calculateHeight() >= MAXHEIGHT && power > 0) {
-      //stopElevator();
+      stopElevator();
     } else {
       leftElevatorMotor.setPower(power);
       rightElevatorMotor.setPower(power);
@@ -64,9 +64,10 @@ public class IntakeAPI{
   //For later. The goal is to be able to set a height and the motors will move there using encoders. Pretty simple
   public boolean setHeight(double power, double targetHeight) {
     currentHeight = calculateHeight();
-    totalDistance = Math.abs(targetHeight - currentHeight);
+    totalDistance = targetHeight - currentHeight;
     power = Math.abs(power);
     boolean finished = false;
+<<<<<<< Updated upstream
     if (targetHeight >= MAXHEIGHT) {
       stopElevator();
         finished = true;
@@ -82,12 +83,30 @@ public class IntakeAPI{
       finished = false;
     }
     
+=======
+    while (totalDistance < .1 || totalDistance > .1 || !finished) {
+        if (targetHeight >= MAXHEIGHT) {
+          stopElevator();
+          finished = true;
+          telemetry.addLine("setHeight() FAILED: Height set over max height");
+        } else if (currentHeight == targetHeight || totalDistance < .5 || finished) {
+          stopElevator();
+        } else if (currentHeight > targetHeight && totalDistance > .5 && !finished) {
+          controlElevator(-power);
+          finished = false;
+        } else if (currentHeight < targetHeight && totalDistance > .5 && !finished) {
+          controlElevator(power);
+          finished = false;
+        }
+
+>>>>>>> Stashed changes
       if (finished) {
           telemetry.addLine("setHeight() COMPLETE");
       } else {
           telemetry.addData("Target height: ", targetHeight);
           telemetry.addData("Current height: ", calculateHeight());
       }
+    }
       return finished;
   }
 
@@ -96,10 +115,10 @@ public class IntakeAPI{
   public boolean resetElevator() {
     double currentHeight = calculateHeight();
     boolean finished = false;
-    if (currentHeight > 2) {
+    if (currentHeight > .25) {
       elevatorDown();
       finished = false;
-    } else if(currentHeight <= .5) {
+    } else if(currentHeight <= .25) {
       stopElevator();
       finished = true;
     }
@@ -184,7 +203,7 @@ public class IntakeAPI{
 
   //Calucalte height by averaging the two elevator motors' distance together
   private double calculateHeight() {
-    return (calculateDistance(this.leftElevatorMotor) + calculateDistance(this.rightElevatorMotor))/2; //might need to be made negative
+    return (-calculateDistance(this.leftElevatorMotor) + calculateDistance(this.rightElevatorMotor))/2; //might need to be made negative
   }
 
   //Sets the Elevator up speed if needed
