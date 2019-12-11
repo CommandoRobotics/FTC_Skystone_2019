@@ -80,7 +80,7 @@ public class TeleopMain extends LinearOpMode {
               }
             }
 
-            if(gamepad1.b && gamepad1.dpad_left){
+            if(gamepad1.left_stick_button && gamepad1.right_stick_button){
               capstonePlacer.place();
             }
 
