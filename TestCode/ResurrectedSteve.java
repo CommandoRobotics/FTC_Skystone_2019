@@ -18,7 +18,7 @@ public class ResurrectedSteve extends LinearOpMode {
     @Override
     public void runOpMode(){
 
-        FTCOmniDriveAPI RIPSteve = new FTCOmniDriveAPI(hardwareMap);
+        FTCOmniDriveAPI RIPSteve = new FTCOmniDriveAPI(hardwareMap, telemetry);
         gamepad1.setJoystickDeadzone(0);
         
         

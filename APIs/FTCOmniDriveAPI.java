@@ -6,12 +6,9 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.Hardware;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import org.firstinspires.ftc.teamcode.APIs.GyroscopeAPI;
+import org.firstinspires.ftc.teamcode.APIs.*;
 
 public class FTCOmniDriveAPI{
-
-  //Create gyroscope Object
-  GyroscopeAPI gyro;
 
   //Outputs to wheel
   double leftMotorSpeed;
@@ -23,10 +20,18 @@ public class FTCOmniDriveAPI{
   double targetSPosition;
 
   //Motors
-  public DcMotor leftMotor;
-  public DcMotor rightMotor;
+  DcMotor leftMotor;
+  DcMotor rightMotor;
   DcMotor strafeMotor;
   Telemetry telemetry;
+  GyroscopeAPI gyro;
+  PidAPI leftStraightPID;
+  PidAPI rightStraightPID;
+  PidAPI strafeStraightPID;
+  PidAPI leftRotatePID;
+  PidAPI rightRotatePID;
+  PidAPI strafeRotatePID;
+
 
   //Color Sensors
   ColorSensorAPI leftFColor;
@@ -44,12 +49,19 @@ public class FTCOmniDriveAPI{
     this.leftMotor = hwMap.get(DcMotor.class, "leftDrive");
     this.rightMotor = hwMap.get(DcMotor.class, "rightDrive");
     this.strafeMotor = hwMap.get(DcMotor.class, "strafeDrive");
+    this.gyro = new GyroscopeAPI(hwMap);
+    //this.leftStraightPID = new PidAPI();
+    //this.rightStraightPID = new PidAPI();
+    //this.strafeStraightPID = new PidAPI();
+    this.leftRotatePID = new PidAPI(PidAPI.PID_MODE, 0.5, 0.02, 0.0006, 0.01, 1e9);
+    this.rightRotatePID = new PidAPI(PidAPI.PID_MODE, 0.5, 0.02, 0.0006, 0.01, 1e9);
+    leftRotatePID.makeAllGainsNegative();
+    //this.strafeRotatePID = new PidAPI();
     // this.rightFColor = new ColorSensorAPI(hwMap, "frontRightColorSensor");
     // this.leftFColor = new ColorSensorAPI(hwMap, "frontLeftColorSensor");
-    this.undersideColor = new ColorSensorAPI(hwMap, "undersideColorSensor");
+    this.undersideColor = new ColorSensorAPI(hwMap, "undersideColor");
     this.strafeMotor.setDirection(DcMotor.Direction.REVERSE);
     this.telemetry = tele;
-    gyro = new GyroscopeAPI(hwMap);
   }
 
 
@@ -143,12 +155,12 @@ public class FTCOmniDriveAPI{
 
   //Drives forward or backwards based on a power input infintely
   public void driveStraight(float straightPower) {
-    driveOmni(straightPower,0,0);
+    driveOmni(0,straightPower,0);
   }
 
 
 
-
+  //DRIVE WITH JUST ENCODERS
 
 
 
@@ -250,6 +262,87 @@ public class FTCOmniDriveAPI{
 
 
 
+  //DRIVE WITH PID AND ENCODERS
+
+
+
+  public void driveStraightPID(double distance, double bias) {
+
+    setTargetStraightPosition(distance);
+    telemetry.addLine("Starting to Drive Straight");
+
+    double startTime = System.nanoTime();
+    double dt = System.nanoTime() - startTime;
+    gyro.update();
+    double targetValue = -gyro.getZ();
+
+    while(!straightWithPID(bias,dt,targetValue)) {
+      dt = System.nanoTime() - startTime;
+      straightWithPID(bias, dt,targetValue);
+      telemetry.update();
+    }
+    stopMotors();
+  }
+
+  //Need to correct rotation, setPoint, and drift to left/right
+  public boolean straightWithPID(double bias, double dt, double targetValue) {
+
+    leftRotatePID.setBias(bias);
+    rightRotatePID.setBias(bias);
+    gyro.update();
+
+    //Transform the encoder counts to start positions and finish positions
+    double totalDistance = targetFPosition - getDistanceStraight();
+    //straightPower = Math.abs(straightPower);
+    boolean finished = false;
+
+    if(totalDistance >= 0) {
+        if (totalDistance <= .1 && totalDistance >= -.1) {
+          stopMotors();
+          telemetry.addLine("driveSraightPID() COMPLETE");
+          finished = true;
+        } else {
+          leftMotor.setPower(-leftRotatePID.getOutput(-gyro.getZ(), targetValue, dt));
+          rightMotor.setPower(rightRotatePID.getOutput(-gyro.getZ(), targetValue, dt));
+          telemetry.addData("Distance Left to Drive: ", totalDistance);
+          finished = false;
+        }
+    } else {
+        if (totalDistance <= .1 && totalDistance >= -.1) {
+          stopMotors();
+          telemetry.addLine("driveSraightPID() COMPLETE");
+          finished = true;
+        } else {
+          leftMotor.setPower(leftRotatePID.getOutput(-gyro.getZ(), targetValue, dt));
+          rightMotor.setPower(-rightRotatePID.getOutput(-gyro.getZ(), targetValue, dt));
+          telemetry.addData("Distance Left to Drive: ", totalDistance);
+          finished = false;
+        }
+    }
+    return finished;
+  }
+
+  public void pidTest(double bias, double targetValue, double startTime) {
+        telemetry.addData("Left PID", 0);
+    telemetry.update();
+    while(true) {
+    double dt = System.nanoTime() - startTime;
+
+
+    leftRotatePID.setBias(bias);
+    rightRotatePID.setBias(bias);
+    gyro.update();
+
+    leftMotor.setPower(-leftRotatePID.getOutput(-gyro.getZ(), targetValue, dt));
+    rightMotor.setPower(rightRotatePID.getOutput(-gyro.getZ(), targetValue, dt));
+    telemetry.addData("Right PID", rightRotatePID.getOutput(gyro.getZ(), targetValue, dt));
+    telemetry.addData("Left PID", leftRotatePID.getOutput(gyro.getZ(), targetValue, dt));
+    telemetry.addData("Rotation: ", -gyro.getZ());
+    telemetry.update();
+    }
+  }
+
+
 
 
   //Rotates forward or backwards based on a power input infintely
@@ -329,5 +422,4 @@ public class FTCOmniDriveAPI{
     }
     return modifiedAngle;
   }
-
 }
