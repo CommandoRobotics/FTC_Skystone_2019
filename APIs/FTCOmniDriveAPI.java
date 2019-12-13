@@ -35,7 +35,7 @@ public class FTCOmniDriveAPI{
 
   //Color Sensors
   ColorSensorAPI leftFColor;
-  ColorSensorAPI rightFColor;
+  public ColorSensorAPI rightFColor;
   public static ColorSensorAPI undersideColor;
 
   //Variables used to calulate distance per pulse
@@ -57,7 +57,7 @@ public class FTCOmniDriveAPI{
     this.rightRotatePID = new PidAPI(PidAPI.PID_MODE, 0.5, 0.02, 0.0006, 0.01, 1e9);
     leftRotatePID.makeAllGainsNegative();
     //this.strafeRotatePID = new PidAPI();
-    // this.rightFColor = new ColorSensorAPI(hwMap, "frontRightColorSensor");
+    this.rightFColor = new ColorSensorAPI(hwMap, "frontRightColor");
     // this.leftFColor = new ColorSensorAPI(hwMap, "frontLeftColorSensor");
     this.undersideColor = new ColorSensorAPI(hwMap, "undersideColor");
     this.strafeMotor.setDirection(DcMotor.Direction.REVERSE);
@@ -120,6 +120,18 @@ public class FTCOmniDriveAPI{
     this.strafeMotor.setPower(strafeMotorSpeed);
   }
 
+  public void driveOmniPID(float xSpeed, float ySpeed, float rotateSpeed, double targetValue, double dt) {
+    calculateWheelSpeeds(xSpeed, ySpeed, rotateSpeed);
+    gyro.update();
+
+    leftRotatePID.setBias(rightMotorSpeed);
+    rightRotatePID.setBias(leftMotorSpeed);
+
+    this.rightMotor.setPower(rightRotatePID.getOutput(-gyro.getZ(), targetValue, dt));
+    this.leftMotor.setPower(-leftRotatePID.getOutput(-gyro.getZ(), targetValue, dt));
+    this.strafeMotor.setPower(strafeMotorSpeed);
+  }
+
   //Allows you to control each part of the robot's chassis
   public void controlChassis(double leftPower, double rightPower, double strafePower) {
     this.rightMotor.setPower(rightPower);
@@ -129,7 +141,7 @@ public class FTCOmniDriveAPI{
 
   //Drives forward or backwards based on a power input infintely
   public void driveStraight(float straightPower) {
-    driveOmni(0,straightPower,0);
+    driveOmni(straightPower,0,0);
   }
 
 
@@ -240,34 +252,31 @@ public class FTCOmniDriveAPI{
 
 
 
-  public void driveStraightPID(double distance, double bias) {
+  public void driveStraightPID(double distance, float bias) {
 
     setTargetStraightPosition(distance);
     telemetry.addLine("Starting to Drive Straight");
 
     double startTime = System.nanoTime();
     double dt = System.nanoTime() - startTime;
-    gyro.update();
-    double targetValue = -gyro.getZ();
 
-    while(!straightWithPID(bias,dt,targetValue)) {
+    gyro.update();
+    double targetAngle = gyro.getZ();
+
+    while(!straightWithPID(bias,dt,targetAngle)) {
       dt = System.nanoTime() - startTime;
-      straightWithPID(bias, dt,targetValue);
+      straightWithPID(bias,dt,targetAngle);
       telemetry.update();
     }
     stopMotors();
   }
 
   //Need to correct rotation, setPoint, and drift to left/right
-  public boolean straightWithPID(double bias, double dt, double targetValue) {
-
-    leftRotatePID.setBias(bias);
-    rightRotatePID.setBias(bias);
-    gyro.update();
+  public boolean straightWithPID(float bias, double dt, double targetAngle) {
 
     //Transform the encoder counts to start positions and finish positions
     double totalDistance = targetFPosition - getDistanceStraight();
-    //straightPower = Math.abs(straightPower);
+    float straightPower = Math.abs(bias);
     boolean finished = false;
 
     if(totalDistance >= 0) {
@@ -276,8 +285,7 @@ public class FTCOmniDriveAPI{
           telemetry.addLine("driveSraightPID() COMPLETE");
           finished = true;
         } else {
-          leftMotor.setPower(-leftRotatePID.getOutput(-gyro.getZ(), targetValue, dt));
-          rightMotor.setPower(rightRotatePID.getOutput(-gyro.getZ(), targetValue, dt));
+          driveOmniPID(0,bias,0,targetAngle, dt);
           telemetry.addData("Distance Left to Drive: ", totalDistance);
           finished = false;
         }
@@ -287,8 +295,7 @@ public class FTCOmniDriveAPI{
           telemetry.addLine("driveSraightPID() COMPLETE");
           finished = true;
         } else {
-          leftMotor.setPower(leftRotatePID.getOutput(-gyro.getZ(), targetValue, dt));
-          rightMotor.setPower(-rightRotatePID.getOutput(-gyro.getZ(), targetValue, dt));
+          driveOmniPID(0,-bias,0,targetAngle, dt);
           telemetry.addData("Distance Left to Drive: ", totalDistance);
           finished = false;
         }

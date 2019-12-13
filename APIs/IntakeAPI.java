@@ -21,12 +21,13 @@ public class IntakeAPI{
   double elevatorDownPower = -.5;
   double inPower = .6;
   double outPower = -.3;
-  private final double MAXHEIGHT = 0;
+  private final double MAXHEIGHT = 20;
   double currentHeight;
   double totalDistance;
- 
+    boolean setFinished = false;
+
   //values used for encoders
-  private double DIAMETER = 2;
+  private double DIAMETER = 1;
   private double RADIUS = DIAMETER/2;
   private double PULSESPERROTATION = 1120;
   private double circumference = 2*RADIUS*3.14159;
@@ -61,53 +62,35 @@ public class IntakeAPI{
     }
   }
 
+
   //For later. The goal is to be able to set a height and the motors will move there using encoders. Pretty simple
   public boolean setHeight(double power, double targetHeight) {
+
     currentHeight = calculateHeight();
     totalDistance = targetHeight - currentHeight;
     power = Math.abs(power);
-    boolean finished = false;
-<<<<<<< Updated upstream
     if (targetHeight >= MAXHEIGHT) {
       stopElevator();
-        finished = true;
+        setFinished = true;
         telemetry.addLine("setHeight() FAILED: Height set over max height");
-    } else if (currentHeight == targetHeight || totalDistance < .5 || finished) {
+    } else if (currentHeight == targetHeight || totalDistance < .5 || setFinished) {
       stopElevator();
-      finished = true;
-    } else if (currentHeight > targetHeight && totalDistance > .5 && !finished) {
-      controlElevator(-power);
-      finished = false;
-    } else if (currentHeight < targetHeight && totalDistance > .5 && !finished) {
+      setFinished = true;
+    } else if (currentHeight > targetHeight && totalDistance > .5 && !setFinished) {
       controlElevator(power);
-      finished = false;
+      setFinished = false;
+    } else if (currentHeight < targetHeight && totalDistance > .5 && !setFinished) {
+      controlElevator(-power);
+      setFinished = false;
     }
-    
-=======
-    while (totalDistance < .1 || totalDistance > .1 || !finished) {
-        if (targetHeight >= MAXHEIGHT) {
-          stopElevator();
-          finished = true;
-          telemetry.addLine("setHeight() FAILED: Height set over max height");
-        } else if (currentHeight == targetHeight || totalDistance < .5 || finished) {
-          stopElevator();
-        } else if (currentHeight > targetHeight && totalDistance > .5 && !finished) {
-          controlElevator(-power);
-          finished = false;
-        } else if (currentHeight < targetHeight && totalDistance > .5 && !finished) {
-          controlElevator(power);
-          finished = false;
-        }
-
->>>>>>> Stashed changes
-      if (finished) {
+      if (setFinished) {
           telemetry.addLine("setHeight() COMPLETE");
       } else {
           telemetry.addData("Target height: ", targetHeight);
           telemetry.addData("Current height: ", calculateHeight());
       }
-    }
-      return finished;
+
+      return setFinished;
   }
 
   //Sets the Elevator all the way back to the ground using encoder values
@@ -122,7 +105,7 @@ public class IntakeAPI{
       stopElevator();
       finished = true;
     }
-    
+
     if (finished) {
         telemetry.addLine("Elevator Height Complete/Reached");
     } else {
@@ -144,8 +127,8 @@ public class IntakeAPI{
 
   ////Forces the elevator down at a certain power no matter the signage of the inupt
   public void elevatorDown() {
-    this.leftElevatorMotor.setPower(this.elevatorDownPower);
-    this.rightElevatorMotor.setPower(this.elevatorDownPower);
+    this.leftElevatorMotor.setPower(-this.elevatorDownPower);
+    this.rightElevatorMotor.setPower(-this.elevatorDownPower);
   }
 
   //Stops all Elevator motors
@@ -203,7 +186,7 @@ public class IntakeAPI{
 
   //Calucalte height by averaging the two elevator motors' distance together
   private double calculateHeight() {
-    return (-calculateDistance(this.leftElevatorMotor) + calculateDistance(this.rightElevatorMotor))/2; //might need to be made negative
+    return (-calculateDistance(this.leftElevatorMotor)); //might need to be made negative
   }
 
   //Sets the Elevator up speed if needed
