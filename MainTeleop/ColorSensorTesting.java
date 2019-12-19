@@ -14,12 +14,12 @@ public class ColorSensorTesting extends LinearOpMode{
 
     //ColorSensor frontRightColor = hardwareMap.get(ColorSensor.class, "frontRightColor");
 
-    
+
 
     @Override
     public void runOpMode(){
-        ColorSensorAPI color = new ColorSensorAPI(hardwareMap, "frontRightColor");
-        
+        ColorSensorAPI color = new ColorSensorAPI(hardwareMap, "undersideColor");
+
         waitForStart();
         while(opModeIsActive()){
             telemetry.addData("Red", color.getRed());
@@ -30,5 +30,5 @@ public class ColorSensorTesting extends LinearOpMode{
             telemetry.update();
         }
     }
-    
+
 }

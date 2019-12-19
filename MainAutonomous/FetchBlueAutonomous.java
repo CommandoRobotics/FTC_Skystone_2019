@@ -5,10 +5,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.teamcode.APIs.*;
 
-@Autonomous(name="Fetch Red")
+@Autonomous(name="Fetch Blue")
 //@Disabled
 
-public class NavigateWithoutStrafe extends LinearOpMode {
+public class FetchBlueAutonomous extends LinearOpMode {
     @Override
     public void runOpMode() {
 
@@ -45,7 +45,7 @@ public class NavigateWithoutStrafe extends LinearOpMode {
 
       //right strafe
       intake.controlIntake(0);
-      chassis.driveStrafePID(72, 0.9f, opModeIsActive());
+      chassis.driveStrafePID(-72, 0.9f, opModeIsActive());
 
       //forward w/elevator lifting
       chassis.setTargetStraightPosition(12);
@@ -62,17 +62,17 @@ public class NavigateWithoutStrafe extends LinearOpMode {
         intake.controlIntake(1);
       }
 
-
       intake.stopElevator();
       chassis.stopMotors();
 
+
       //back up while lowering elevator and outaking
-      chassis.setTargetStraightPosition(-9);
+      chassis.setTargetStraightPosition(-7);
       telemetry.addLine("Starting to Drive Straight");
       while ((!chassis.straightWithEnc(0.6f) || !intake.resetElevator()) && opModeIsActive()) {
         chassis.straightWithEnc(0.6f);
         intake.resetElevator();
-        intake.controlIntake(0.4);
+        intake.controlIntake(1);
         telemetry.update();
       }
 
@@ -80,8 +80,8 @@ public class NavigateWithoutStrafe extends LinearOpMode {
       intake.stopElevator();
       chassis.stopMotors();
 
-      while ((chassis.undersideColor.getRed() < 330) && opModeIsActive()) {
-        chassis.driveOmni(-.4f,0,0);
+      while ((chassis.undersideColor.getBlue() < 320) && opModeIsActive()) {
+        chassis.driveOmni(.4f,0,0);
       }
       intake.stopIntake();
       intake.stopElevator();
