@@ -22,6 +22,8 @@ public class TeleopMain extends LinearOpMode {
         IntakeAPI intake = new IntakeAPI(hardwareMap, telemetry);
         CapstonePlacerAPI capstonePlacer = new CapstonePlacerAPI(hardwareMap);
 
+        intake.resetElevatorEncoders();
+
         boolean previousA = false;
         boolean slowModeActive = false;
 
@@ -46,9 +48,9 @@ public class TeleopMain extends LinearOpMode {
             if(!slowModeActive){
               robot.driveOmniJoystick(gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
               if(gamepad1.left_trigger > 0 && gamepad1.right_trigger == 0){
-                intake.controlElevator(gamepad1.left_trigger);
+                intake.controlElevatorS(gamepad1.left_trigger);
               } else if(gamepad1.right_trigger > 0 && gamepad1.left_trigger == 0){
-                intake.controlElevator(-gamepad1.right_trigger);
+                intake.setHeight(.5,2.3);
               } else {
                 intake.controlElevator(0);
               }
@@ -80,9 +82,11 @@ public class TeleopMain extends LinearOpMode {
               }
             }
 
-            if(gamepad1.left_stick_button && gamepad1.right_stick_button){
+            if(gamepad1.b && gamepad1.dpad_left){
               capstonePlacer.place();
             }
+
+            telemetry.addData("intake height: ", intake.calculateHeight());
 
         }
     }

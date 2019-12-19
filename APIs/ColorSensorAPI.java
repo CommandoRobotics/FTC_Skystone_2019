@@ -10,7 +10,6 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 public class ColorSensorAPI {
 
   ColorSensor color;
-  //TEST
 
   public ColorSensorAPI(HardwareMap hwMap, String sensorName) {
     color = hwMap.get(ColorSensor.class, sensorName);
@@ -19,17 +18,17 @@ public class ColorSensorAPI {
     public double getRed() {
         return color.red();
     }
-    
+
     public double getGreen() {
         return color.green();
     }
-    
+
     public double getBlue() {
         return color.blue();
     }
 
   public boolean isBlack() {
-    if ((color.red() > 140 && color.red() < 155) && (color.green() < 260 && color.green() > 230)) {
+    if ((color.red() > 140 && color.red() < 155) && (color.green() < 285 && color.green() > 260)) {
       return true;
     } else {
       return false;
@@ -37,7 +36,7 @@ public class ColorSensorAPI {
   }
 
   public boolean isYellow() {
-    if ((color.red() > 200 && color.red() < 250) && (color.green() > 300 && color.green() < 370)) {
+    if ((color.red() > 165 && color.red() < 250) && (color.green() > 280 && color.green() < 410)) {
       return true;
     } else {
       return false;

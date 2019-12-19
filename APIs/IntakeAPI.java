@@ -21,7 +21,7 @@ public class IntakeAPI{
   double elevatorDownPower = -.5;
   double inPower = .6;
   double outPower = -.3;
-  private final double MAXHEIGHT = 20;
+  private final double MAXHEIGHT = 2.75;
   double currentHeight;
   double totalDistance;
     boolean setFinished = false;
@@ -54,12 +54,19 @@ public class IntakeAPI{
 
   //Allows you to control the Elevator by setting it to a + or - power
   public void controlElevator(double power) {
-    if (calculateHeight() >= MAXHEIGHT && power > 0) {
+    if ((calculateHeight() >= MAXHEIGHT) && (power < 0)) {
+      stopElevator();
+    } else if ((calculateHeight() <= 0) && (power > 0)) {
       stopElevator();
     } else {
       leftElevatorMotor.setPower(power);
       rightElevatorMotor.setPower(power);
     }
+  }
+
+  public void controlElevatorS(double power) {
+      leftElevatorMotor.setPower(power);
+      rightElevatorMotor.setPower(power);
   }
 
 
@@ -73,20 +80,20 @@ public class IntakeAPI{
       stopElevator();
         setFinished = true;
         telemetry.addLine("setHeight() FAILED: Height set over max height");
-    } else if (currentHeight == targetHeight || totalDistance < .5 || setFinished) {
+    } else if ((currentHeight == targetHeight) || (totalDistance < .25 && totalDistance > -.25)|| setFinished) {
       stopElevator();
       setFinished = true;
-    } else if (currentHeight > targetHeight && totalDistance > .5 && !setFinished) {
-      controlElevator(power);
+    } else if (currentHeight > targetHeight && totalDistance < -.25) {
+      controlElevatorS(power);
       setFinished = false;
-    } else if (currentHeight < targetHeight && totalDistance > .5 && !setFinished) {
-      controlElevator(-power);
+    } else if (currentHeight < targetHeight && totalDistance > .25) {
+      controlElevatorS(-power);
       setFinished = false;
     }
       if (setFinished) {
           telemetry.addLine("setHeight() COMPLETE");
       } else {
-          telemetry.addData("Target height: ", targetHeight);
+          telemetry.addData("Target height: ", totalDistance);
           telemetry.addData("Current height: ", calculateHeight());
       }
 
@@ -98,8 +105,8 @@ public class IntakeAPI{
   public boolean resetElevator() {
     double currentHeight = calculateHeight();
     boolean finished = false;
-    if (currentHeight > .25) {
-      elevatorDown();
+    if (currentHeight > .2) {
+      controlElevatorS(0.3);
       finished = false;
     } else if(currentHeight <= .25) {
       stopElevator();
@@ -127,8 +134,12 @@ public class IntakeAPI{
 
   ////Forces the elevator down at a certain power no matter the signage of the inupt
   public void elevatorDown() {
-    this.leftElevatorMotor.setPower(-this.elevatorDownPower);
-    this.rightElevatorMotor.setPower(-this.elevatorDownPower);
+    if (calculateHeight() >= MAXHEIGHT) {
+      stopElevator();
+    } else {
+      this.leftElevatorMotor.setPower(-this.elevatorDownPower);
+      this.rightElevatorMotor.setPower(-this.elevatorDownPower);
+    }
   }
 
   //Stops all Elevator motors
@@ -185,7 +196,7 @@ public class IntakeAPI{
   }
 
   //Calucalte height by averaging the two elevator motors' distance together
-  private double calculateHeight() {
+  public double calculateHeight() {
     return (-calculateDistance(this.leftElevatorMotor)); //might need to be made negative
   }
 

@@ -56,7 +56,10 @@ public class NewRobotTest extends LinearOpMode {
                     //elevatorActive = false;
                 }
             }
-            telemetry.addData("", elevatorActive);
+            telemetry.addData("red", robot.rightFColor.getRed());
+            telemetry.addData("green`", robot.rightFColor.getGreen());
+            telemetry.addData("blue", robot.rightFColor.getBlue());
+
             telemetry.update();
         }
 

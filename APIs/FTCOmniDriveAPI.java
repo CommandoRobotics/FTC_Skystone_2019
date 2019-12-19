@@ -53,8 +53,8 @@ public class FTCOmniDriveAPI{
     //this.leftStraightPID = new PidAPI();
     //this.rightStraightPID = new PidAPI();
     //this.strafeStraightPID = new PidAPI();
-    this.leftRotatePID = new PidAPI(PidAPI.PID_MODE, 0.5, 0.02, 0.0006, 0.01, 1e9);
-    this.rightRotatePID = new PidAPI(PidAPI.PID_MODE, 0.5, 0.02, 0.0006, 0.01, 1e9);
+    this.leftRotatePID = new PidAPI(PidAPI.PID_MODE, 0.55, 0.018, 0.0008, 0.01, 1e9);
+    this.rightRotatePID = new PidAPI(PidAPI.PID_MODE, 0.55, 0.018, 0.0008, 0.01, 1e9);
     leftRotatePID.makeAllGainsNegative();
     //this.strafeRotatePID = new PidAPI();
     this.rightFColor = new ColorSensorAPI(hwMap, "frontRightColor");
@@ -151,10 +151,10 @@ public class FTCOmniDriveAPI{
 
 
   //Combines setTargetStraightPosition and straightWithEnc
-  public void driveStraightEnc(double distance, float power) {
+  public void driveStraightEnc(double distance, float power, boolean opActive) {
     setTargetStraightPosition(distance);
     telemetry.addLine("Starting to Drive Straight");
-    while(!straightWithEnc(power)) {
+    while(!straightWithEnc(power) && opActive) {
       straightWithEnc(power);
       telemetry.update();
     }
@@ -175,7 +175,7 @@ public class FTCOmniDriveAPI{
     boolean finished = false;
 
     if(totalDistance >= 0) {
-        if (totalDistance <= .1 && totalDistance >= -.1) {
+        if (totalDistance <= .2 && totalDistance >= -.2) {
           stopMotors();
           telemetry.addLine("driveSraightEnc() COMPLETE");
           finished = true;
@@ -185,7 +185,7 @@ public class FTCOmniDriveAPI{
           finished = false;
         }
     } else {
-        if (totalDistance <= .1 && totalDistance >= -.1) {
+        if (totalDistance <= .2 && totalDistance >= -.2) {
           stopMotors();
           telemetry.addLine("driveSraightEnc() COMPLETE");
           finished = true;
@@ -199,10 +199,10 @@ public class FTCOmniDriveAPI{
   }
 
   //Combines setTargetStrafePosition and strafeWithEnc
-  public void driveStrafeEnc(double distance, float power) {
+  public void driveStrafeEnc(double distance, float power, boolean opActive) {
     setTargetStrafePosition(distance);
     telemetry.addLine("Starting to Drive Strafe");
-    while(!strafeWithEnc(power)) {
+    while(!strafeWithEnc(power) && opActive) {
       strafeWithEnc(power);
       telemetry.update();
     }
@@ -223,7 +223,7 @@ public class FTCOmniDriveAPI{
     boolean finished = false;
 
     if(totalDistance >= 0) {
-        if (totalDistance <= .1 && totalDistance >= -.1) {
+        if (totalDistance <= .2 && totalDistance >= -.2) {
           stopMotors();
           telemetry.addLine("driveStrafeEnc() COMPLETE");
           finished = true;
@@ -252,7 +252,7 @@ public class FTCOmniDriveAPI{
 
 
 
-  public void driveStraightPID(double distance, float bias) {
+  public void driveStraightPID(double distance, float bias, boolean opActive) {
 
     setTargetStraightPosition(distance);
     telemetry.addLine("Starting to Drive Straight");
@@ -263,7 +263,7 @@ public class FTCOmniDriveAPI{
     gyro.update();
     double targetAngle = gyro.getZ();
 
-    while(!straightWithPID(bias,dt,targetAngle)) {
+    while(!straightWithPID(bias,dt,targetAngle) && opActive) {
       dt = System.nanoTime() - startTime;
       straightWithPID(bias,dt,targetAngle);
       telemetry.update();
@@ -280,7 +280,7 @@ public class FTCOmniDriveAPI{
     boolean finished = false;
 
     if(totalDistance >= 0) {
-        if (totalDistance <= .1 && totalDistance >= -.1) {
+        if (totalDistance <= .2 && totalDistance >= -.2) {
           stopMotors();
           telemetry.addLine("driveSraightPID() COMPLETE");
           finished = true;
@@ -290,13 +290,64 @@ public class FTCOmniDriveAPI{
           finished = false;
         }
     } else {
-        if (totalDistance <= .1 && totalDistance >= -.1) {
+        if (totalDistance <= .2 && totalDistance >= -.2) {
           stopMotors();
           telemetry.addLine("driveSraightPID() COMPLETE");
           finished = true;
         } else {
           driveOmniPID(0,-bias,0,targetAngle, dt);
           telemetry.addData("Distance Left to Drive: ", totalDistance);
+          finished = false;
+        }
+    }
+    return finished;
+  }
+
+  //Combines setTargetStrafePosition and strafeWithEnc
+  public void driveStrafePID(double distance, float power, boolean opActive) {
+    setTargetStrafePosition(distance);
+    telemetry.addLine("Starting to Drive Strafe");
+
+    double startTime = System.nanoTime();
+    double dt = System.nanoTime() - startTime;
+
+    gyro.update();
+    double targetAngle = gyro.getZ();
+
+    while(!strafeWithPID(power,dt,targetAngle) && opActive) {
+      dt = System.nanoTime() - startTime;
+      strafeWithPID(power,dt,targetAngle);
+      telemetry.update();
+    }
+    stopMotors();
+  }
+
+  //Drives strafe to a certain distance at a power
+  //meant to be run continuously
+  public boolean strafeWithPID(float bias, double dt, double targetAngle) {
+    //Transform the encoder counts to start positions and finish positions
+    double totalDistance = targetSPosition - getDistanceStrafe();
+    float strafePower = Math.abs(bias);
+    boolean finished = false;
+
+    if(totalDistance >= 0) {
+        if (totalDistance <= .2 && totalDistance >= -.2) {
+          stopMotors();
+          telemetry.addLine("driveStrafeEnc() COMPLETE");
+          finished = true;
+        } else {
+          driveOmniPID(strafePower,0,0,targetAngle, dt);
+          telemetry.addData("Distance Left to Strafe: ", totalDistance);
+          finished = false;
+        }
+    } else {
+        if (totalDistance <= .2 && totalDistance >= -.2) {
+          stopMotors();
+          telemetry.addLine("driveStrafeEnc() COMPLETE");
+          finished = true;
+        } else {
+          driveOmniPID(-strafePower,0,0,targetAngle, dt);
+          telemetry.addData("Distance Left to Strafe: ", totalDistance);
           finished = false;
         }
     }
